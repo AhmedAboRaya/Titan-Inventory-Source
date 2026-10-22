@@ -1,0 +1,162 @@
+SOURCE_REQUIREMENTS.txt mapping — frontend review, 2026-10-18
+
+Status terms: implemented means source and interface exist; verified identifies
+the exact local checks. It does not mean deployed, production-tested, or that all
+subrequirements in a section are complete. Server/native final evidence is owned
+by their respective tasks. This file records gaps so the full specification is
+not represented as finished by the current functional core release.
+
+1. Scope/decisions
+Implemented: fifth standalone Inventory account/module integrated into Titan;
+no factory data created, other sections left independent. Source files unavailable.
+Verified: UI tests use disposable local databases only. NAS untouched by this task.
+
+2. Architecture
+Implemented: React/TS/Vite, real Nest API contracts, PostgreSQL backend and native
+bundled WebView bridge instead of adding a second Capacitor application identity.
+PWA caches static shell only. Server owns Compose/OpenAPI/production persistence.
+Verified: TypeScript, Vite, actual compiled Nest + PGlite browser tests. Independent
+PostgreSQL session/locking evidence belongs backend tests, not PGlite.
+
+3. Identity/accessibility
+Implemented: original replaceable black/orange TITAN INVENTORY SVG wordmark and
+square icon, Arabic RTL/English LTR, light/dark, loading/error/empty states.
+Verified: Arabic login and English main screens; desktop and 320/390 mobile fit.
+Remaining: dedicated Inventory adaptive icon/splash asset variants beyond current
+Titan application branding; broad accessibility/manual device coverage.
+
+4. Card browsing/images
+Implemented: warehouse -> category -> subcategory -> item -> details, breadcrumbs,
+search, paging, available/reserved, low-stock metrics, authorized priced value;
+item image upload/gallery, camera/file input, center crop/rotation/compression.
+Verified: category navigation, creating an item and selecting it in movements.
+Remaining: a distinct faithful illustration for every initial subcategory (current
+local SVG library shares shape families); richer image editing and selecting the
+primary image from existing gallery. Item table alternate view not yet exposed.
+
+5. Classification/masters
+Implemented: categories/subcategories, sites, warehouses, rack/shelf/bin locations,
+employees/departments/machines/suppliers, global item definition independent of
+warehouse, active/version fields and role controls. No destructive deletion UI.
+Remaining: dedicated ordering/image editors for category definitions; full Arabic
+translations of all seeded subcategory names.
+
+6. Item cards/units
+Implemented: SKU, Arabic/English names, brand/specification/description, unit and
+precision, tracking type, lot/serial/expiry, per-item unit factors, alternate codes,
+per-warehouse minimum/reorder/target levels. Server rejects invalid conversions.
+Remaining: structured manufacturer/dimensions/material/angle and preferred-supplier/
+lead-time/machine-compatibility editors, measured weight/count with explicit estimate
+label, linked raw-material consumption + production receipt + waste workflow.
+
+7. Stock documents
+Implemented: server-supported multi-line types, read-only details, edit Draft,
+submit/approve/post/reject/cancel/reverse with versions; warehouse/department/
+recipient/machine/supplier/reference, reason, notes, dates, approved units/lots/
+serials, custody due date, invoice/production order. PO creates linked receipt draft.
+Verified: receipt10->submit->post, issue3->submit->post, official balance7 in browser.
+Remaining: dedicated repair/return-from-repair and lost-custody workflows, production
+linkage, configurable multi-level approvals/limits. UI can submit only real supported
+actions; it does not simulate missing workflows.
+
+8. Balance safety/ledger
+Implemented: UI never edits balances or calls a generic status update. Server is
+authoritative, UUID writes/version gates, immutable posted details, explicit reversal.
+Verified here: actual receipt/issue, no stock effect from offline queued Draft.
+Server race, reversal, ledger/cost/quality tests are separate evidence.
+
+9. Pricing/purchasing
+Implemented: currency, stored exchange rate, optional input unit cost, unpriced
+state, authorized average/last price, supplier masters, PO approval and linked
+receipt/partial remaining quantities. Hidden prices are not requested via admin bypass.
+Remaining: purchase discount/tax/freight component entry, supplier price-comparison
+screens, approved retroactive unpriced-stock valuation, complete pricing-coverage UX.
+
+10. Quality/lots/custody/counts
+Implemented: lots/serials, quality and condition controls on movement lines, linked
+returns, custody due date/report, warehouse count sheets with recount and independent
+approval; official stock changes only through server actions.
+Remaining: count scope by location/category, complete quality ageing/traceability
+screens and certificates linked directly to lot, repair/loss/overdue alerts dashboard.
+
+11. Accounts/permissions
+Implemented: users, roles, warehouse/department grants, active flags, password reset,
+current account sessions/revoke, own first-admin setup, hidden cost/action controls.
+Verified: auditor UI hides movement creation; actual API returns no cost fields.
+Remaining: detailed audit-history and before/after values UI, configurable approval
+thresholds, administrator view of other users' device/session inventories.
+
+12. Sign-in/biometrics
+Implemented: cookie+CSRF web login; real passkey registration/auth/revoke client;
+native status/password unlock/biometric actions using native owner's secure bridge.
+Setup token and passwords never enter local state storage. Two-minute return lock.
+Verified: first setup then password login on real local uninitialized service.
+Not verified here: physical authenticator/passkey enrollment or physical biometric
+sensor. Native keystore/bridge tests are recorded separately by native task.
+
+13. Offline/sync
+Implemented: scoped IndexedDB/native encrypted cache; durable immutable UUID outbox;
+background active-view refresh/backoff; only Draft saves auto-upload; other writes
+require explicit same-request retry; timestamps/stale banner; paused auth errors;
+local editor restore protects prior content; account/instance/scope isolation.
+Verified: navigate away twice without restoring, original editor recovered; one
+offline UUID uploads one Draft; confirmed stock remains unchanged.
+Remaining: incremental change-cursor apply/atomic cursor cache (current UI re-fetches
+active resources); richer Pending/Syncing/Conflict state reconciliation/editor;
+offline unsent count edits/photos before pressing save; resumable chunk uploads;
+fully configurable offline retention, cache purge policy UI and Sync Now summary.
+Stored historical permission scopes are isolated, not silently reassigned or sent.
+
+14. Management Dashboard
+Not complete: backend has limited metrics but no dashboard screen, adjustable
+widgets, required comparison/time-series charts, shared multi-dimensional filters,
+dead-stock/reorder/coverage models or drilldown suite. Current category metrics are
+not a substitute for this specification section.
+
+15. Reports/search/barcodes
+Implemented: balances, ledger, item history, custody, warehouse/date filters, paging,
+server XLSX action, web print/save-PDF and native print bridge action.
+Verified here: actual admin/auditor XLSX download and read-only rendering, numeric
+quantity7, cost-column omission, exact high-precision fallback; Arabic A4 portrait
+and landscape browser PDFs rendered/inspected for the one-row fixture. English dark
+mobile320/390 fits; narrow report columns remain reachable with inner scrolling.
+Evidence: review/inventory-output/render-report.txt. Native output is separate.
+Remaining: full valuation/price/supplier/lot/quality/count/stale/activity/approval
+report suite, full field search, QR/barcode scanner and labels, designed receipt/
+issue/transfer/count print forms, multi-page/long-row output verification, friendly
+Arabic XLSX schema headings and minimum mobile report cell widths. Browser printing
+currently prints the displayed report page; Excel fetches all authorized pages.
+
+16. Existing files/import
+Implemented: reviewed structured JSON rows -> server validation preview -> selected
+row approval by another account; source/original text preserved. No opening stock
+or missing prices inferred. The five named source documents are absent.
+Remaining: file-specific DOCX/PDF mapping, reviewed Excel template importer and
+cross-file reconciliation/opening-count workflow once actual sources are supplied.
+
+17. Data/API
+Frontend uses /inventory/v1, exact server DTOs, GET reads and explicit POST actions,
+optimistic versions and UUID idempotency; no direct DB access. Backend owns schemas,
+OpenAPI/migrations and real PostgreSQL acceptance evidence. UI date formatting uses
+the device locale/timezone; explicit Africa/Cairo display still needs a consistency
+pass if devices are outside Egypt (game dates already explicitly use Cairo).
+
+18. Synology/security/backups
+Outside this frontend task: parent owns fixed HTTPS /inventory gateway, isolated
+database/container/attachments volumes, deployment, backup/restore and rollback.
+No live server writes or production secrets were used. User's HTTPS decision
+overrides the imported document's VPN-only suggestion, as saved in decisions.
+
+19. Acceptance tests
+Verified by our UI scripts: core card navigation, item creation, actual 10-3=7,
+limited-user UI/API prices, offline draft without duplicate/post, setup, responsive
+mobile/desktop. Native six-size Titan hub tests include all five module links,
+eight avatars and game interactions. Other nineteen acceptance items require their
+respective backend/native reports; screenshots alone are not proof of every rule.
+
+20. Delivery
+Real source, bundled UI, durable local adapter, repeatable build hooks and tests
+exist. FRONTEND_HANDOFF.txt documents source and tests. No production APK, server
+deployment, migration or real account verification was performed by this subtask.
+The whole original twenty-section specification remains incomplete in the gaps
+above; the working receipt/issue core should be presented accurately as such.

@@ -1,0 +1,7 @@
+deploy/.secrets/
+deploy/backups/
+.local/
+.tooling/
+node_modules/
+.env
+dist/

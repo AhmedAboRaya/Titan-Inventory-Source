@@ -1,0 +1,11 @@
+node_modules
+.tooling
+.local
+.env
+deploy/.secrets
+deploy/backups
+source-data
+tests
+docs
+dist
+*.log

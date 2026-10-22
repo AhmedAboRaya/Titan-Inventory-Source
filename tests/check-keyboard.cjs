@@ -1,0 +1,22 @@
+// Real compiled forms; synthetic accounts and viewport contraction only, no production.
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
+const {chromium}=require('C:/Users/zokar/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const root=path.resolve(__dirname,'../dist/web'),report=[];
+const server=http.createServer((req,res)=>{const rel=new URL(req.url,'http://localhost').pathname.replace(/^\/inventory\//,'')||'index.html',file=path.resolve(root,rel);if(!file.startsWith(root+path.sep))return res.writeHead(403).end();try{res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.svg')?'image/svg+xml':'text/html;charset=utf-8');res.end(fs.readFileSync(file))}catch{res.writeHead(404).end()}});
+async function visibleField(page,field){
+ await field.focus();await page.waitForTimeout(150);
+ const r=await field.evaluate(e=>{const b=e.getBoundingClientRect(),v=visualViewport;return{top:b.top,bottom:b.bottom,height:b.height,vtop:v.offsetTop,vbottom:v.offsetTop+v.height}});
+ assert(r.top>=r.vtop-1&&Math.min(r.bottom,r.top+45)<=r.vbottom-10,JSON.stringify(r));return r;
+}
+(async()=>{await new Promise(r=>server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+server.address().port;const browser=await chromium.launch({channel:'msedge',headless:true});try{for(const width of[320,390,412]){const context=await browser.newContext({viewport:{width,height:844},hasTouch:true,isMobile:true,serviceWorkers:'block'});await context.route('**/*',r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());await context.addInitScript(()=>{
+ localStorage.setItem('inventory.language','en');let signed=false;
+ const session={actor:{id:'00000000-0000-4000-8000-000000000001',username:'qa',display_name:'QA only',permissions:['catalog.read','catalog.write'],warehouse_ids:[],department_ids:[],all_warehouses:false,all_departments:false,role_id:'qa',version:1},instance:{id:'qa'},csrf:'test',nativeScope:'qa',expiresAt:new Date(Date.now()+3600000).toISOString()};
+ window.TitanInventory={request(raw){const q=JSON.parse(raw);let status=200,body=[];
+ if(q.action==='status')body={locked:true,localUnlockAvailable:false,biometricEnabled:false};
+ else if(q.path==='/v1/auth/status')body={initialized:true};
+ else if(q.path==='/v1/auth/login'){signed=true;body=session}
+ else if(q.path==='/v1/auth/me'){status=signed?200:401;body=signed?session:{error:{message:'Synthetic sign in'}}}
+ else if(q.action==='cacheGet')body={value:null};else if(q.action==='cacheSet')body={saved:true};
+ setTimeout(()=>dispatchEvent(new CustomEvent('titan:inventory-response',{detail:{id:q.id,status,body}})),0);
+ }};
+ });const page=await context.newPage();await page.goto(origin+'/inventory/');const user=page.locator('[name=username]'),password=page.locator('[name=password]');await user.fill('qa');await password.fill('Synthetic only');await page.setViewportSize({width,height:350});const fields=[];fields.push(await visibleField(page,user));fields.push(await visibleField(page,password));assert.equal(await password.inputValue(),'Synthetic only');await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.locator('.workspace').waitFor();await page.setViewportSize({width,height:844});await page.locator('.add-inline').click();await page.locator('.modal').waitFor();const inputs=page.locator('.modal input:not([type=checkbox]),.modal textarea');assert(await inputs.count()>1);const last=inputs.last();await last.fill('123.5');await page.setViewportSize({width,height:300});fields.push(await visibleField(page,last));const modal=await page.locator('.modal').boundingBox();assert(modal.y>=0&&modal.y+modal.height<=301);assert.equal(await last.inputValue(),'123.5');await page.screenshot({path:path.resolve(__dirname,'../../../review/inventory-keyboard-'+width+'.png')});await page.setViewportSize({width,height:844});assert.equal(await last.inputValue(),'123.5');report.push({width,loginFieldsReachable:true,modalReachable:true,inputPreserved:true,fields});await context.close();}fs.writeFileSync(path.resolve(__dirname,'../../../review/inventory-keyboard-060.json'),JSON.stringify({ok:true,kind:'browser viewport contraction, not hardware IME',cases:report},null,2));console.log('Inventory login and modal keyboard cases PASS: '+report.length);}finally{await browser.close();server.close();}})().catch(e=>{console.error(e);process.exitCode=1;server.close()});

@@ -1,0 +1,28 @@
+{
+  "name": "titan-inventory", "version": "0.1.0", "private": true,
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "build:server": "tsc -p tsconfig.server.json",
+    "build:web": "vite build",
+    "build": "npm run build:server && npm run build:web",
+    "start": "node dist/server/main.js",
+    "test": "tsx --test tests/*.test.ts",
+    "bootstrap": "tsx server/bootstrap.ts",
+    "seed:medical": "node tools/import_seed_data.cjs",
+    "seed:october": "node tools/seed_full_october_history.cjs",
+    "dev": "vite --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.0", "@nestjs/core": "^11.1.0", "@nestjs/platform-express": "^11.1.0",
+    "@nestjs/swagger": "^11.0.0", "reflect-metadata": "^0.2.2", "rxjs": "^7.8.2",
+    "express": "^5.1.0", "pg": "^8.16.0", "decimal.js": "^10.6.0", "zod": "^4.0.0",
+    "react": "^19.1.0", "react-dom": "^19.1.0", "exceljs": "^4.4.0",
+    "@simplewebauthn/server": "^13.0.0", "@simplewebauthn/browser": "^13.0.0", "sharp": "^0.34.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0", "vite": "^7.0.0", "@vitejs/plugin-react": "^5.0.0",
+    "@types/node": "^24.0.0", "@types/express": "^5.0.0", "@types/pg": "^8.15.0",
+    "@types/react": "^19.1.0", "@types/react-dom": "^19.1.0", "tsx": "^4.20.0",
+    "@electric-sql/pglite": "^0.3.0", "supertest": "^7.1.0", "@types/supertest": "^6.0.0"
+  }
+}

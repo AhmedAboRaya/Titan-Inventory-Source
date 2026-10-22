@@ -1,0 +1,95 @@
+TITAN INVENTORY frontend candidate — 2026-10-18
+
+Source and build
+  src/ React + TypeScript; index.html; vite.config.ts; public/art/*.svg.
+  Vite base /inventory/, output dist/web. Native opens the same bundled files at
+  https://inventory.titan.invalid/inventory/ with a native request bridge.
+  npm run build:web and TypeScript tsc -p tsconfig.json. The parent orchestrator
+  owns APK version/build/release and the HTTPS gateway. No live deployment was
+  performed by this frontend task.
+
+Implemented interface
+  Arabic RTL and English LTR, light/dark, compact footer and responsive layout.
+  Independent login, first-admin setup token form, account/session view, web
+  passkeys, native biometric actions, two-minute return lock, explicit logout.
+  Warehouse-filtered category -> subcategory -> item cards, search and pagination.
+  Item definition, position balances, unit conversions, lots, serials, item levels,
+  alternate codes, authorized cost data, image gallery and attachments. Images can
+  be photographed/selected, rotated, center-cropped and compressed before upload.
+  Warehouses, locations, sites/departments/employees/machines/suppliers, categories,
+  users, roles and scopes have forms and read-only details before editing.
+  Receipt/issue and supported stock document forms, multi-line drafts, details,
+  submit/independent approval/post/cancel/reject/reversal with server versions.
+  Purchase orders -> linked receipt draft; counts/physical recount; structured
+  item-import preview and independent selected-row approval; period closing.
+  Balances/ledger/custody reports with 200-row pages, server Excel export, web
+  print/PDF and native print action. No quantities of different units are summed.
+
+Data behavior
+  Every submitted business write is stored durably with a UUID before network.
+  The same pending path/body reuses the same UUID after an uncertain response.
+  Only document Draft save requests retry automatically. Posting, approving,
+  reversing and other business actions require explicit user retry in Saved
+  locally. Server acknowledgement is required before official success is shown.
+  Unsaved document editor state is persisted separately and restored only after
+  the user chooses Restore; opening a new editor does not overwrite an older
+  local draft before that choice.
+  Web IndexedDB keys include instance, account, role version, permissions and
+  warehouse/department scopes. Native storage uses the bridge's exact nativeScope
+  and encrypted atomic cache. Protected native requests carry accountId+scope so
+  an old callback cannot send under another account. No central/shared login.
+  Refresh every five seconds is single-flight with backoff; forms retain edits.
+  Cached reads show their timestamp and explicitly state that stock is not current.
+  Session/cost permissions are rechecked on the server. Cost controls are hidden
+  without cost.read. Scope changes replace the visible workspace.
+  The service worker caches only an exact static-shell allowlist, never v1 APIs,
+  cookies, attachments or business response data. Native uses bundled assets and
+  does not register a browser service worker.
+
+First setup
+  On initialized=false, the UI requests username/display_name/password/setup_token.
+  The token is manually supplied by the server administrator. No token/password
+  is put in local/session/IndexedDB or application configuration. Successful setup
+  clears the form and returns to ordinary login. Only synthetic tokens/accounts
+  were used in the isolated QA fixture.
+
+Hub integration
+  tools/apply_inventory_hub.cjs adds Inventory logo/button/name and divides orbit
+  angles by buttons.length. tools/build_launcher.cjs and web/build.cjs invoke it.
+  Frozen approved preview sources remain unchanged. launcher/runtime.js and
+  web/hub-runtime.js recognize inventory. Root owns native navigation and hosted
+  config routing /inventory/ to the independent service.
+
+Verified locally (no upstream or real accounts)
+  TypeScript compilation and Vite build pass.
+  tests/check-ui.cjs: actual compiled Nest + disposable PGlite login, create item,
+  receipt 10 -> post, issue 3 -> post, official balance 7; auditor cannot create
+  movements or see cost fields; 320/390 mobile no horizontal overflow; desktop
+  and Arabic login screenshots. No JavaScript errors or external network.
+  tests/check-offline.cjs: restore survives navigation before the restore choice,
+  offline save stores one request UUID, online sync creates exactly one Draft,
+  stock remains 7. No fake posted state.
+  tests/check-setup.cjs: actual uninitialized API verifies synthetic setup token,
+  creates first administrator, clears credentials, then authenticates that account.
+  tools/check_launcher.cjs: all five modules route; six viewport sizes, eight
+  moving avatars, drag-to-open, long press entry, pause, swipes, music and legacy
+  local state retention pass. Native bridge is separately tested by native owner.
+  tests/check-output.cjs: actual Arabic report prints to A4 portrait/landscape,
+  readable single-row render; English dark320/390 fit; report scroll remains inside
+  its container; actual admin/auditor XLSX cost scopes. Delegated exports.ts fix
+  supplies numeric cells, exact high-precision text, full-width metadata and Cairo
+  filename. Six export/workflow tests pass. Full output evidence and known print/
+  narrow-column limits: review/inventory-output/render-report.txt.
+  Evidence: review/inventory-ui/, review/launcher-qa/, review/inventory-output/.
+
+Explicit boundaries
+  The five source documents have not been provided/imported. No invented stock,
+  prices, employees or source records exist outside disposable test fixtures.
+  Import UI currently consumes reviewed structured JSON rows, not arbitrary XLSX
+  semantic mapping. Source-file-specific import mapping remains dependent on those
+  five files. Camera/file picker and Android secure storage/biometric/export/print
+  integration are owned and tested in the native task.
+  Browser permission tests do not prove multi-session PostgreSQL locking; separate
+  real PostgreSQL tests are owned by the backend task.
+  Passkey UI is integrated with the real API but a physical biometric/authenticator
+  enrollment was not performed. No production account/session/sync was tested.

@@ -1,0 +1,9 @@
+// Loopback-only disposable browser QA. No production credentials or databases.
+import{fixture,TestDatabase}from'./harness';import{resolve}from'node:path';import{migrate}from'../server/db';import{seed}from'../server/seed';import{hash}from'../server/common';
+const{createApp}=require('../dist/server/http.js');const{Inventory}=require('../dist/server/service.js');
+(async()=>{const fresh=process.env.INVENTORY_UI_QA_UNINITIALIZED==='1';const db=fresh?new TestDatabase():null;if(db){await migrate(db);await seed(db)}const f=fresh?{db}:await fixture();if('write'in f){await f.write('masters',{kind:'supplier',name:'Fixture Supplier'});await f.write('users',{username:'auditor',display_name:'Fixture Auditor',password:'TEST-only-auditor-4821',role_id:'auditor',warehouse_ids:[f.w.id],department_ids:[f.dep.id],all_warehouses:false,all_departments:false});}
+ const port=Number(process.env.INVENTORY_UI_QA_PORT||19012);if(!Number.isInteger(port)||port<1024||port>65535)throw Error('Invalid QA port');
+ const app=await createApp(new Inventory(f.db),{publicOrigin:'http://127.0.0.1:'+port,basePath:'/inventory',publicDir:resolve('dist/web'),...(fresh?{setupHash:hash('TEST-only-setup-token-local-4821')}:{})});await app.listen(port,'127.0.0.1');
+ process.stdout.write(JSON.stringify({ready:true,url:`http://127.0.0.1:${port}/inventory/`,...(fresh?{uninitialized:true}:{warehouse:(f as any).w.id,item:(f as any).item.id,department:(f as any).dep.id})})+'\n');
+ process.on('SIGTERM',async()=>{await app.close();await f.db.close();process.exit(0)});process.on('SIGINT',async()=>{await app.close();await f.db.close();process.exit(0)});
+})().catch(e=>{console.error(e);process.exit(1)});

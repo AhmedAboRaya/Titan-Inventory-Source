@@ -1,0 +1,4 @@
+# Optional local-operator access only. Not needed for the shared Docker proxy network.
+services:
+  api:
+    ports: ["127.0.0.1:${INVENTORY_BIND_PORT:?Reserve a unique NAS loopback port first}:8080"]
