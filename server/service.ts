@@ -5,7 +5,7 @@ import { Stock } from './stock';
 import { Workflows } from './workflows';
 import { Attachments } from './attachments';
 import { exportReport } from './exports';
-import { Actor, fail, hash, json, permit, uuid, warehouse, department, visible, z, text, PERMISSIONS } from './common';
+import { Actor, fail, hash, json, permit, uuid, warehouse, department, visible, z, text, PERMISSIONS, resolveItemId } from './common';
 export class Inventory {
  readonly auth:Auth; readonly catalog=new Catalog();readonly stock=new Stock();readonly workflows=new Workflows(this.stock,this.catalog);
  readonly attachments:Attachments;
@@ -27,12 +27,13 @@ export class Inventory {
   const parts=path.split('/').filter(Boolean),kind=parts[0],id=parts[1];
   if(kind==='bootstrap')return{actor:a,instance:(await one(this.db,"SELECT value FROM settings WHERE key='instance'"))!.value,warehouses:await this.catalog.list(this.db,a,'warehouses'),categories:await this.catalog.list(this.db,a,'categories'),permissions:PERMISSIONS};
   if(['warehouses','locations','categories','items','masters','lots'].includes(kind!))return id&&kind==='items'?this.catalog.item(this.db,a,id):this.catalog.list(this.db,a,kind!,q);
+  if(kind==='balances')return this.report(this.db,a,'balances',q);
   if(kind==='documents')return id?this.stock.get(this.db,a,id):this.stock.list(this.db,a,q);
   if(kind==='attachments')return this.attachments.read(this.db,a,id,q);
   if(kind==='exports')return exportReport(this,a,id||'balances',q);
   if(['purchase-orders','counts','imports'].includes(kind!))return this.workflows.read(this.db,a,kind!,id,q);
-  if(kind==='serials'){permit(a,'catalog.read');return(await this.db.query('SELECT * FROM serials WHERE item_id=$1',[uuid.parse(q.item_id)])).rows;}
-  if(kind==='item-levels'){permit(a,'catalog.read');return(await this.db.query('SELECT * FROM item_levels WHERE item_id=$1 AND ($2::uuid[] IS NULL OR warehouse_id=ANY($2))',[uuid.parse(q.item_id),a.all_warehouses?null:a.warehouse_ids])).rows;}
+  if(kind==='serials'){permit(a,'catalog.read');const itemId=await resolveItemId(this.db,q.item_id);return(await this.db.query('SELECT * FROM serials WHERE item_id=$1',[itemId])).rows;}
+  if(kind==='item-levels'){permit(a,'catalog.read');const itemId=await resolveItemId(this.db,q.item_id);return(await this.db.query('SELECT * FROM item_levels WHERE item_id=$1 AND ($2::uuid[] IS NULL OR warehouse_id=ANY($2))',[itemId,a.all_warehouses?null:a.warehouse_ids])).rows;}
   if(kind==='users')return this.auth.users(a);
   if(kind==='roles'){permit(a,'users');return(await this.db.query('SELECT * FROM roles ORDER BY name')).rows;}
   if(kind==='sessions'){return(await this.db.query('SELECT token_hash AS id,device,created_at,last_seen,expires_at,revoked FROM sessions WHERE user_id=$1 ORDER BY created_at DESC',[a.id])).rows;}
@@ -48,7 +49,7 @@ export class Inventory {
  async mutate(a:Actor,key:string,path:string,body:any,sessionHash?:string){
   return this.write(a,key,path,body,async(tx,current)=>{
    const [kind,id,action]=path.split('/').filter(Boolean);
-   if(['warehouses','locations','categories','items','masters','lots','conversions'].includes(kind!))return this.catalog.save(tx,current,kind!,body,id);
+   if(['warehouses','locations','categories','items','masters','lots','conversions'].includes(kind!)){if(action==='delete'&&id)return this.catalog.delete(tx,current,kind!,id);return this.catalog.save(tx,current,kind!,body,id);}
    if(kind==='users')return this.auth.saveUser(tx,current,body,id);
    if(kind==='roles')return this.auth.saveRole(tx,current,body);
    if(kind==='attachments')return this.attachments.upload(tx,current,body);
@@ -65,16 +66,16 @@ export class Inventory {
  async report(tx:SQL,a:Actor,kind:string,q:Record<string,string>){
   permit(a,'reports');permit(a,'stock.read');if(q.warehouse_id)warehouse(a,uuid.parse(q.warehouse_id));
   const scope=q.warehouse_id?[q.warehouse_id]:a.all_warehouses?null:a.warehouse_ids;
-  const limit=Math.min(1000,Math.max(1,Number(q.limit)||200)),offset=Math.min(100000,Math.max(0,Number(q.offset)||0));
-  if(kind==='balances')return visible((await tx.query(`SELECT b.*,i.sku,i.name_ar,i.base_unit,w.name warehouse_name,l.name location_name,lot.code lot_code,lot.expires_on,
+  const limit=Math.min(1000,Math.max(1,Number(q.limit)||200)),offset=Math.min(100000,Math.max(0,Number(q.offset)||0)),itemId=await resolveItemId(tx,q.item_id);
+  if(kind==='balances')return visible((await tx.query(`SELECT b.*,i.sku,i.name_ar,i.name_en,i.base_unit,w.name warehouse_name,l.name location_name,lot.code lot_code,lot.expires_on,lot.notes lot_notes,
    CASE WHEN b.quality='Accepted' AND b.condition NOT IN('Repair','Damaged') AND b.holder_id IS NULL AND b.transit_id IS NULL AND (lot.expires_on IS NULL OR lot.expires_on>=CURRENT_DATE) THEN b.quantity-b.reserved ELSE 0 END available,
    CASE WHEN c.unpriced_quantity=0 AND c.quantity>0 THEN b.quantity*c.value/c.quantity END value
    FROM balances b JOIN items i ON i.id=b.item_id JOIN warehouses w ON w.id=b.warehouse_id LEFT JOIN locations l ON l.id=b.location_id LEFT JOIN lots lot ON lot.id=b.lot_id LEFT JOIN costs c ON c.item_id=b.item_id
-   WHERE ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1)) AND ($2::uuid IS NULL OR b.item_id=$2) AND b.quantity>0 ORDER BY i.sku,w.name,b.position_key LIMIT $3 OFFSET $4`,[scope,q.item_id?uuid.parse(q.item_id):null,limit,offset])).rows,a);
+   WHERE ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1)) AND ($2::uuid IS NULL OR b.item_id=$2) AND b.quantity>0 ORDER BY i.sku,w.name,b.position_key LIMIT $3 OFFSET $4`,[scope,itemId,limit,offset])).rows,a);
   if(kind==='ledger')return visible((await tx.query(`SELECT l.id,l.document_id,l.quantity,l.unit_cost,l.posted_at,d.number,d.type,d.document_date,d.reason,d.department_id,d.machine_id,i.sku,i.name_ar,i.base_unit,w.name warehouse_name,b.quality,b.condition
    FROM ledger l JOIN documents d ON d.id=l.document_id JOIN balances b ON b.position_key=l.position_key JOIN items i ON i.id=b.item_id JOIN warehouses w ON w.id=b.warehouse_id
    WHERE ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1)) AND ($2::uuid IS NULL OR b.item_id=$2) AND ($3::uuid[] IS NULL OR d.department_id IS NULL OR d.department_id=ANY($3))
-   AND ($4::date IS NULL OR d.document_date>=$4) AND ($5::date IS NULL OR d.document_date<=$5) ORDER BY l.id DESC LIMIT $6 OFFSET $7`,[scope,q.item_id?uuid.parse(q.item_id):null,a.all_departments?null:a.department_ids,q.from||null,q.to||null,limit,offset])).rows,a);
+   AND ($4::date IS NULL OR d.document_date>=$4) AND ($5::date IS NULL OR d.document_date<=$5) ORDER BY l.id DESC LIMIT $6 OFFSET $7`,[scope,itemId,a.all_departments?null:a.department_ids,q.from||null,q.to||null,limit,offset])).rows,a);
   if(kind==='custody')return(await tx.query(`SELECT c.*,i.sku,i.name_ar,m.name holder_name,d.warehouse_id FROM custody c JOIN document_lines l ON l.id=c.line_id JOIN items i ON i.id=l.item_id JOIN documents d ON d.id=c.document_id JOIN masters m ON m.id=c.holder_id WHERE ($1::uuid[] IS NULL OR d.warehouse_id=ANY($1)) ORDER BY c.due_on,c.id LIMIT $2 OFFSET $3`,[scope,limit,offset])).rows;
   fail('REPORT','التقرير غير موجود',404);
  }

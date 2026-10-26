@@ -14,15 +14,24 @@ function positionKey(p:Position){return hash([p.item_id,p.warehouse_id,p.locatio
 function decimalString(value:Decimal){return value.toFixed(6);}
 export class Stock {
  async get(tx:SQL,a:Actor,id:string){
-  permit(a,'stock.read');const d=await one(tx,'SELECT d.*,u.display_name creator_name FROM documents d JOIN users u ON u.id=d.created_by WHERE d.id=$1',[uuid.parse(id)]);if(!d)fail('NOT_FOUND','المستند غير موجود',404);warehouse(a,d.warehouse_id);department(a,d.department_id);if(d.destination_warehouse_id)warehouse(a,d.destination_warehouse_id);
+  permit(a,'stock.read');const d=await one(tx,`SELECT d.*,u.display_name creator_name,m.name recipient_name,m.data->>'badge' recipient_badge,m.data->>'job_title' recipient_job,dep.name department_name FROM documents d JOIN users u ON u.id=d.created_by LEFT JOIN masters m ON m.id=d.recipient_id LEFT JOIN masters dep ON dep.id=d.department_id WHERE d.id=$1`,[uuid.parse(id)]);if(!d)fail('NOT_FOUND','المستند غير موجود',404);warehouse(a,d.warehouse_id);department(a,d.department_id);if(d.destination_warehouse_id)warehouse(a,d.destination_warehouse_id);
   d.lines=(await tx.query('SELECT l.*,i.sku,i.name_ar,i.base_unit FROM document_lines l JOIN items i ON i.id=l.item_id WHERE document_id=$1 ORDER BY l.id',[id])).rows;return visible(d,a);
  }
  async list(tx:SQL,a:Actor,q:Record<string,string>={}){
   permit(a,'stock.read');if(q.warehouse_id)warehouse(a,uuid.parse(q.warehouse_id));const warehouses=a.all_warehouses?null:a.warehouse_ids;
-  return visible((await tx.query(`SELECT d.*,u.display_name creator_name FROM documents d JOIN users u ON u.id=d.created_by
-   WHERE ($1::uuid[] IS NULL OR (warehouse_id=ANY($1) AND (destination_warehouse_id IS NULL OR destination_warehouse_id=ANY($1))))
-   AND ($2::uuid[] IS NULL OR department_id IS NULL OR department_id=ANY($2)) AND ($3='' OR status=$3) AND ($4::uuid IS NULL OR warehouse_id=$4 OR destination_warehouse_id=$4)
-   ORDER BY created_at DESC LIMIT 100`,[warehouses,a.all_departments?null:a.department_ids,q.status||'',q.warehouse_id||null])).rows,a);
+  const deptId=q.department_id?uuid.parse(q.department_id):null;
+  const recId=q.recipient_id?uuid.parse(q.recipient_id):null;
+  const docType=q.type||'';
+  return visible((await tx.query(`SELECT d.*,u.display_name creator_name,m.name recipient_name,m.data->>'badge' recipient_badge,m.data->>'job_title' recipient_job,dep.name department_name, (SELECT count(*)::int FROM document_lines l WHERE l.document_id=d.id) lines_count FROM documents d JOIN users u ON u.id=d.created_by
+   LEFT JOIN masters m ON m.id=d.recipient_id LEFT JOIN masters dep ON dep.id=d.department_id
+   WHERE ($1::uuid[] IS NULL OR (d.warehouse_id=ANY($1) AND (d.destination_warehouse_id IS NULL OR d.destination_warehouse_id=ANY($1))))
+   AND ($2::uuid[] IS NULL OR d.department_id IS NULL OR d.department_id=ANY($2))
+   AND ($3='' OR d.status=$3)
+   AND ($4::uuid IS NULL OR d.warehouse_id=$4 OR d.destination_warehouse_id=$4)
+   AND ($5::uuid IS NULL OR d.department_id=$5)
+   AND ($6::uuid IS NULL OR d.recipient_id=$6)
+   AND ($7='' OR d.type=$7)
+   ORDER BY d.created_at DESC LIMIT 500`,[warehouses,a.all_departments?null:a.department_ids,q.status||'',q.warehouse_id?uuid.parse(q.warehouse_id):null,deptId,recId,docType])).rows,a);
  }
  async save(tx:SQL,a:Actor,body:unknown,id?:string){
   const b=docSchema.parse(body);permit(a,permission[b.type]!);warehouse(a,b.warehouse_id);department(a,b.department_id);

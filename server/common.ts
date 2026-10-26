@@ -40,3 +40,9 @@ export function visible(value:any,a:Actor):any{
   if(value&&typeof value==='object'&&!(value instanceof Date)){const result:any={}; for(const [key,v]of Object.entries(value))if(!costKeys.has(key))result[key]=visible(v,a); return result;}
   return value;
 }
+export async function resolveItemId(db:{query:<T=any>(text:string,values?:any[])=>Promise<{rows:T[]}>},idOrSku?:string|null):Promise<string|null>{
+  if(!idOrSku)return null;
+  if(uuid.safeParse(idOrSku).success)return idOrSku;
+  const row=(await db.query('SELECT id FROM items WHERE sku=$1',[idOrSku])).rows[0];
+  return row?.id||null;
+}

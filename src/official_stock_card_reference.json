@@ -1,0 +1,754 @@
+[
+  {
+    "category": "Thermal Stickers 🔆",
+    "code": "SBS5060 (T)",
+    "name": "Sterile barrier thermal",
+    "lot": "(N.A) (Parked)",
+    "qty": "14 رول",
+    "remarks": ""
+  },
+  {
+    "category": "Thermal Stickers 🔆",
+    "code": "AMS3030 (T)",
+    "name": "Lot. thermal",
+    "lot": "(N.A) (Parked)",
+    "qty": "10 رول",
+    "remarks": ""
+  },
+  {
+    "category": "Thermal Stickers 🔆",
+    "code": "PBS7010 (T)",
+    "name": "Protective thermal",
+    "lot": "(N.A) (Parked)",
+    "qty": "12 رول",
+    "remarks": ""
+  },
+  {
+    "category": "Thermal Stickers 🔆",
+    "code": "WOS5050(T)",
+    "name": "Work order thermal",
+    "lot": "(N.A) (Parked)",
+    "qty": "41 رول",
+    "remarks": "بغرفه الطباعة"
+  },
+  {
+    "category": "Thermal Stickers 🔆",
+    "code": "AMS7010(T)",
+    "name": "Ampule thermal",
+    "lot": "(N.A)",
+    "qty": "0 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "C 4000 stickers 📂",
+    "code": "PBS70104",
+    "name": "Protective 7*10 (Continuous)",
+    "lot": "(N.A) (Parked)",
+    "qty": "22 رول",
+    "remarks": ""
+  },
+  {
+    "category": "C 4000 stickers 📂",
+    "code": "SBS50604",
+    "name": "Sterile barrier 5*6",
+    "lot": "(N.A) (Parked)",
+    "qty": "17 رول",
+    "remarks": ""
+  },
+  {
+    "category": "C 4000 stickers 📂",
+    "code": "AMS30304",
+    "name": "Ampule 3*3",
+    "lot": "(N.A) (Parked)",
+    "qty": "26 رول",
+    "remarks": ""
+  },
+  {
+    "category": "C 4000 stickers 📂",
+    "code": "TRS40154",
+    "name": "Traceability 4*1.5",
+    "lot": "(N.A) (Parked)",
+    "qty": "46 رول",
+    "remarks": ""
+  },
+  {
+    "category": "C 6000 stickers 📇",
+    "code": "PBS07106",
+    "name": "Protective 7*10",
+    "lot": "26/7/2026 (Parked)",
+    "qty": "12 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "C 6000 stickers 📇",
+    "code": "SBS50606",
+    "name": "Sterile barrier 5*6",
+    "lot": "26/7/2026 (Parked)",
+    "qty": "22 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "C 6000 stickers 📇",
+    "code": "AMS30306",
+    "name": "Ampule 3*3",
+    "lot": "10/8/2026 (Parked)",
+    "qty": "3 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "C 6000 stickers 📇",
+    "code": "TRS40156",
+    "name": "Traceability 4*1.5",
+    "lot": "10/8/2026 (Parked)",
+    "qty": "11 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "New Package",
+    "code": "PPS084.56",
+    "name": "Protective 8*4.5",
+    "lot": "20/4/2026 (Parked)",
+    "qty": "50 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "New Package",
+    "code": "AMS3.56",
+    "name": "Ampoule 3.5*3.5",
+    "lot": "20/4/2026 (Parked)",
+    "qty": "91 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "New Package",
+    "code": "IFU",
+    "name": "Instruction for use",
+    "lot": "30/9/2026 (Parked)",
+    "qty": "12 قطعة",
+    "remarks": "45 N"
+  },
+  {
+    "category": "New Package",
+    "code": "PB1510",
+    "name": "Protective pouch",
+    "lot": "LOT-11102026-PB1510 (Parked)",
+    "qty": "420 Kg",
+    "remarks": ""
+  },
+  {
+    "category": "New Package",
+    "code": "SBB1007",
+    "name": "Sterile barrier pouch",
+    "lot": "SB120726 (In Use)",
+    "qty": "125 كجم",
+    "remarks": ""
+  },
+  {
+    "category": "New Package",
+    "code": "HOIM98261",
+    "name": "Holder (Accepted)",
+    "lot": "HO030826 (In Use)",
+    "qty": "7 كجم",
+    "remarks": ""
+  },
+  {
+    "category": "New Package",
+    "code": "VIAL11841",
+    "name": "Ampoule",
+    "lot": "AM0826 (Parked)",
+    "qty": "15.5 كجم",
+    "remarks": ""
+  },
+  {
+    "category": "New Package",
+    "code": "VIAL11841",
+    "name": "Ampoule",
+    "lot": "AM0426 (Parked)",
+    "qty": "10.5 كجم",
+    "remarks": "10.5 Kg (5500 Ampoule) (N)"
+  },
+  {
+    "category": "New Package",
+    "code": "HOIM98261-INSP",
+    "name": "Holder (Under inspection)",
+    "lot": "HO071026 (Parked)",
+    "qty": "7 كجم",
+    "remarks": "7 kg Under inspection"
+  },
+  {
+    "category": "Raw Materials 🔧",
+    "code": "TIG50600",
+    "name": "Titanium Grade 5 (D 6 ml L 2.80 m)  (bar=360gm)",
+    "lot": "LH2023278 (Parked)",
+    "qty": "1945 قطعة",
+    "remarks": "تم فتح باليته 30/7/2026"
+  },
+  {
+    "category": "Raw Materials 🔧",
+    "code": "BR5.6000",
+    "name": "Brass bar",
+    "lot": "Cu1026 (Parked)",
+    "qty": "69 بار",
+    "remarks": ""
+  },
+  {
+    "category": "Raw Materials 🔧",
+    "code": "AC100000",
+    "name": "Acrylic bar",
+    "lot": "ACR0826 (In Use)",
+    "qty": "20 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Raw Materials 🔧",
+    "code": "AC100000",
+    "name": "Acrylic bar",
+    "lot": "ACR0726 (In Use)",
+    "qty": "1 قطعة",
+    "remarks": "1 (1m)"
+  },
+  {
+    "category": "Raw Materials 🔧",
+    "code": "ST42008",
+    "name": "Stainless 420",
+    "lot": "ST0426 (In Use)",
+    "qty": "13 bar 3 m (D8)",
+    "remarks": ""
+  },
+  {
+    "category": "Raw Materials 🔧",
+    "code": "TI120000",
+    "name": "Titanium block 12",
+    "lot": "N.A (In Use)",
+    "qty": "132 قطعة",
+    "remarks": "رصيد راكد مرحل من دفاتر 2025 (وارد 2023)"
+  },
+  {
+    "category": "Raw Materials 🔧",
+    "code": "TE080000",
+    "name": "Teflon D8 L 100 cm",
+    "lot": "TF0226 (Parked)",
+    "qty": "13 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Raw Materials 🔧",
+    "code": "TI140000",
+    "name": "Titanium block 14",
+    "lot": "N.A (In Use)",
+    "qty": "16 قطعة",
+    "remarks": "رصيد راكد مرحل من دفاتر 2025 (وارد 2023)"
+  },
+  {
+    "category": "Raw Materials 🔧",
+    "code": "STG31606 STG31610",
+    "name": "Stainless steel 316 L",
+    "lot": "ST061025-D10 (Parked)",
+    "qty": "2 Bar",
+    "remarks": "2 (D10) (bar=760gm)"
+  },
+  {
+    "category": "Raw Materials 🔧",
+    "code": "STG31606 STG31610",
+    "name": "Stainless steel 316 L",
+    "lot": "ST061025 (Parked)",
+    "qty": "46 Bar",
+    "remarks": "46 bar 1.5 m (D6)"
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "ALKALINE D F",
+    "name": "Alkaline detergent (Fairy)",
+    "lot": "3/8/2026 (Parked)",
+    "qty": "8.5 قطعة",
+    "remarks": "502L"
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "ALKALINE D N",
+    "name": "Alkaline detergent (Nitro HD)",
+    "lot": "1513072026 (Parked)",
+    "qty": "4 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "NEUTRAL D N",
+    "name": "Neutral detergent (Nitro MD)",
+    "lot": "0918072026 (Parked)",
+    "qty": "3 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "NEUTRAL D N",
+    "name": "Neutral detergent (Nitro MD)",
+    "lot": "1607012024 (Parked)",
+    "qty": "1 قطعة",
+    "remarks": "1 قطعة"
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "ACIDIC D V",
+    "name": "Acidic detergent (Vinegar)",
+    "lot": "29/9/2026 (Parked)",
+    "qty": "49 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "ADP",
+    "name": "Anodization powder",
+    "lot": "4/10/2026 (Parked)",
+    "qty": "10 قطعة",
+    "remarks": "12 N"
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "ACIDIC D C",
+    "name": "Citric acid",
+    "lot": "605010127 (Parked)",
+    "qty": "100 كجم",
+    "remarks": ""
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "ACIDIC D C",
+    "name": "Citric acid",
+    "lot": "503010130 (In Use)",
+    "qty": "25 كجم",
+    "remarks": "25 Kg"
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "ET070%",
+    "name": "Ethanol 70%",
+    "lot": "EA70 (Parked)",
+    "qty": "60 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "ET070%",
+    "name": "Ethanol 70%",
+    "lot": "EA70%0203202 (Parked)",
+    "qty": "10 قطعة",
+    "remarks": "10 L"
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "ET100%",
+    "name": "Ethanol 100%",
+    "lot": "EA19042026 (In Use)",
+    "qty": "120 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "HA37%-PIO",
+    "name": "HCL 37 % Piochem",
+    "lot": "HA37%01092026 (Parked)",
+    "qty": "25 زجاجة",
+    "remarks": "Supplier  374 litre"
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "SA98%",
+    "name": "Sulfuric acid % Piochem",
+    "lot": "SA98%17082026 (In Use)",
+    "qty": "38 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Chemicals 🍶",
+    "code": "HA37%-PAL",
+    "name": "HCL 37% PALAV",
+    "lot": "PC04240228 (Parked)",
+    "qty": "28 زجاجة",
+    "remarks": "28 bottles on shelf (1 bottle deficit)"
+  },
+  {
+    "category": "CR",
+    "code": "OVERHEAD-39",
+    "name": "Over head",
+    "lot": "(N.A) (Parked)",
+    "qty": "1 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "CR",
+    "code": "OVERSHOES-40",
+    "name": "Over shoes",
+    "lot": "(N.A) (Parked)",
+    "qty": "2 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "CR",
+    "code": "GLOVES-41",
+    "name": "Gloves",
+    "lot": "(N.A) (Parked)",
+    "qty": "60 قطعة",
+    "remarks": "190 N"
+  },
+  {
+    "category": "CR",
+    "code": "MASK-42",
+    "name": "Mask",
+    "lot": "(N.A) (Parked)",
+    "qty": "55 قطعة",
+    "remarks": "40 N"
+  },
+  {
+    "category": "CR",
+    "code": "GOWN-43",
+    "name": "gown",
+    "lot": "(N.A) (Parked)",
+    "qty": "28 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Office tools",
+    "code": "A4WHITEPAP-63",
+    "name": "A4 white paper",
+    "lot": "(N.A) (Parked)",
+    "qty": "8 قطعة",
+    "remarks": "20 N"
+  },
+  {
+    "category": "Office tools",
+    "code": "STAPLERPIN-64",
+    "name": "Stapler pins",
+    "lot": "(N.A) (Parked)",
+    "qty": "30 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Office tools",
+    "code": "NOTEBOOK-65",
+    "name": "Notebook",
+    "lot": "(N.A) (Parked)",
+    "qty": "8 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Uniform",
+    "code": "WINTERUNIF-66",
+    "name": "Winter uniform",
+    "lot": "(N.A) (Parked)",
+    "qty": "1 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Uniform",
+    "code": "WHITECOAT-67",
+    "name": "White coat",
+    "lot": "(N.A) (Parked)",
+    "qty": "7 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Uniform",
+    "code": "BLUECOAT-68",
+    "name": "Blue coat",
+    "lot": "(N.A) (Parked)",
+    "qty": "2 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Uniform",
+    "code": "PINKCOAT-69",
+    "name": "Pink coat",
+    "lot": "(N.A) (Parked)",
+    "qty": "6 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Uniform",
+    "code": "DARKBLUE-70",
+    "name": "Dark blue",
+    "lot": "(N.A) (Parked)",
+    "qty": "9 أطقم (3 جديد + 6 غسيل)",
+    "remarks": "3 جديد (New) + 6 غسيل (Washing)"
+  },
+  {
+    "category": "Uniform",
+    "code": "SUMMERUNIF-TS-M",
+    "name": "Summer uniform T-shirt (Size M)",
+    "lot": "(N.A) (Parked)",
+    "qty": "16 Pcs",
+    "remarks": "Size M"
+  },
+  {
+    "category": "Uniform",
+    "code": "SUMMERUNIF-TS-L",
+    "name": "Summer uniform T-shirt (Size L)",
+    "lot": "(N.A) (Parked)",
+    "qty": "11 Pcs",
+    "remarks": "Size L"
+  },
+  {
+    "category": "Uniform",
+    "code": "SUMMERUNIF-TS-XL",
+    "name": "Summer uniform T-shirt (Size XL)",
+    "lot": "(N.A) (Parked)",
+    "qty": "20 Pcs",
+    "remarks": "Size XL"
+  },
+  {
+    "category": "Uniform",
+    "code": "SUMMERUNIF-TS-2XL",
+    "name": "Summer uniform T-shirt (Size 2XL)",
+    "lot": "(N.A) (Parked)",
+    "qty": "10 Pcs",
+    "remarks": "Size 2XL"
+  },
+  {
+    "category": "Uniform",
+    "code": "SUMMERUNIF-TR-XL",
+    "name": "Summer uniform trousers (Size XL)",
+    "lot": "(N.A) (Parked)",
+    "qty": "11 Pcs",
+    "remarks": "Size XL"
+  },
+  {
+    "category": "Uniform",
+    "code": "SUMMERUNIF-TR-2XL",
+    "name": "Summer uniform trousers (Size 2XL)",
+    "lot": "(N.A) (Parked)",
+    "qty": "21 Pcs",
+    "remarks": "Size 2XL"
+  },
+  {
+    "category": "Uniform",
+    "code": "SUMMERUNIF-TR-3XL",
+    "name": "Summer uniform trousers (Size 3XL)",
+    "lot": "(N.A) (Parked)",
+    "qty": "12 Pcs",
+    "remarks": "Size 3XL"
+  },
+  {
+    "category": "Uniform",
+    "code": "SUMMERUNIF-TR-4XL",
+    "name": "Summer uniform trousers (Size 4XL)",
+    "lot": "(N.A) (Parked)",
+    "qty": "11 Pcs",
+    "remarks": "Size 4XL"
+  },
+  {
+    "category": "Uniform",
+    "code": "TROUSERS-L",
+    "name": "Work trousers (Size L)",
+    "lot": "(N.A) (Parked)",
+    "qty": "1 Pcs",
+    "remarks": "Size L"
+  },
+  {
+    "category": "Uniform",
+    "code": "TROUSERS-XL",
+    "name": "Work trousers (Size XL)",
+    "lot": "(N.A) (Parked)",
+    "qty": "14 Pcs",
+    "remarks": "Size XL"
+  },
+  {
+    "category": "Uniform",
+    "code": "TROUSERS-2XL",
+    "name": "Work trousers (Size 2XL)",
+    "lot": "(N.A) (Parked)",
+    "qty": "4 Pcs",
+    "remarks": "Size 2XL"
+  },
+  {
+    "category": "Uniform",
+    "code": "TROUSERS-40",
+    "name": "Work trousers (Size 40)",
+    "lot": "(N.A) (Parked)",
+    "qty": "2 Pcs",
+    "remarks": "Size 40"
+  },
+  {
+    "category": "Uniform",
+    "code": "TROUSERS-48",
+    "name": "Work trousers (Size 48)",
+    "lot": "(N.A) (Parked)",
+    "qty": "2 Pcs",
+    "remarks": "Size 48"
+  },
+  {
+    "category": "Uniform",
+    "code": "TROUSERS-52",
+    "name": "Work trousers (Size 52)",
+    "lot": "(N.A) (Parked)",
+    "qty": "3 Pcs",
+    "remarks": "Size 52"
+  },
+  {
+    "category": "Uniform",
+    "code": "HYGIENEUNI-73",
+    "name": "Hygiene uniform",
+    "lot": "(N.A) (Parked)",
+    "qty": "3 أطقم (3 بنطلون)",
+    "remarks": "3 بنطلون هايجين معتمد"
+  },
+  {
+    "category": "Uniform",
+    "code": "SAND-74",
+    "name": "sand",
+    "lot": "(N.A) (Parked)",
+    "qty": "2.5 شيكارة (1x 110μ + 1.5x 250μ)",
+    "remarks": "1 شيكارة (110 Micron) + 1.5 شيكارة (250 Micron)"
+  },
+  {
+    "category": "Tools &devices",
+    "code": "SCISSORS-44",
+    "name": "SCISSORS",
+    "lot": "(N.A) (Parked)",
+    "qty": "5 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "FORCEPS-45",
+    "name": "forceps",
+    "lot": "(N.A) (Parked)",
+    "qty": "8 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "EXTRAPARTS-46",
+    "name": "Extra parts remover",
+    "lot": "(N.A) (Parked)",
+    "qty": "14 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "ANODIZATIO-47",
+    "name": "Anodization wires",
+    "lot": "(N.A) (Parked)",
+    "qty": "6.5 لفة (6 + ½)",
+    "remarks": "6 لفات كاملة + نصف لفة (6 + ½)"
+  },
+  {
+    "category": "Tools &devices",
+    "code": "STICKROOLS-48",
+    "name": "Stick rools",
+    "lot": "(N.A) (Parked)",
+    "qty": "47 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "ELECTRICIT-49",
+    "name": "Electricity stick rool",
+    "lot": "(N.A) (Parked)",
+    "qty": "16 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "TEFLONROLL-50",
+    "name": "Teflon roll",
+    "lot": "(N.A) (Parked)",
+    "qty": "9 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "PATTERY-51",
+    "name": "pattery",
+    "lot": "(N.A) (Parked)",
+    "qty": "35 قطعة (2 كبير + 33 عادي)",
+    "remarks": "2 كبير (Large) + 33 عادي (Regular)"
+  },
+  {
+    "category": "Tools &devices",
+    "code": "VERNEIRPAT-52",
+    "name": "Verneir pattery",
+    "lot": "(N.A) (Parked)",
+    "qty": "9 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "CUTTERS-53",
+    "name": "Cutters",
+    "lot": "(N.A) (Parked)",
+    "qty": "53 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "CUTTERSWEA-54",
+    "name": "Cutters weapon",
+    "lot": "(N.A) (Parked)",
+    "qty": "110 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "TEPPATTERY-55",
+    "name": "Tep pattery",
+    "lot": "(N.A) (Parked)",
+    "qty": "6 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "ITEM056-56",
+    "name": "اساتك",
+    "lot": "(N.A) (Parked)",
+    "qty": "9 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "RINGLIGHT-57",
+    "name": "Ring light",
+    "lot": "(N.A)",
+    "qty": "0 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "ULTRASONIC-58",
+    "name": "Ultrasonic machine",
+    "lot": "(N.A) (Parked)",
+    "qty": "2 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "ARABOOILFI-59",
+    "name": "Arabo Oil filter (Cloth)",
+    "lot": "(N.A) (Parked)",
+    "qty": "46 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "ARABOOILFI-60",
+    "name": "Arabo Oil filter (Stainless)",
+    "lot": "(N.A) (Parked)",
+    "qty": "40 قطعة (20 كبير + 20 صغير)",
+    "remarks": "20 كبير (Large) + 20 صغير (Small)"
+  },
+  {
+    "category": "Tools &devices",
+    "code": "PYREXBOWL-61",
+    "name": "Pyrex bowl",
+    "lot": "(N.A) (Parked)",
+    "qty": "2 قطعة",
+    "remarks": ""
+  },
+  {
+    "category": "Tools &devices",
+    "code": "ITEM062-62",
+    "name": "مكثفات",
+    "lot": "(N.A) (Parked)",
+    "qty": "8 قطعة",
+    "remarks": ""
+  }
+]

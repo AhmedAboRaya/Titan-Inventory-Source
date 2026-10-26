@@ -15,6 +15,7 @@ function cookie(req:Request){const m=(req.headers.cookie||'').match(/(?:^|;\s*)t
  catch(error:any,host:ArgumentsHost){const response=host.switchToHttp().getResponse<Response>();
   if(error instanceof z.ZodError)return response.status(400).json({error:{code:'VALIDATION',message:'راجع الحقول المطلوبة',fields:error.issues.map(i=>({path:i.path.join('.'),message:i.message}))}});
   if(error instanceof Problem)return response.status(error.status).json({error:{code:error.code,message:error.message}});
+  if(error instanceof URIError)return response.status(400).json({error:{code:'URI_ERROR',message:'مسار غير صالح أو ترميز غير صحيح'}});
   if(error?.code==='23505')return response.status(409).json({error:{code:'DUPLICATE',message:'الكود أو السجل موجود بالفعل'}});
   if(error?.code==='23503')return response.status(400).json({error:{code:'REFERENCE',message:'مرجع غير صالح أو سجل مرتبط ببيانات أخرى'}});
   if(error?.code==='55P03'||error?.code==='40001')return response.status(409).json({error:{code:'BUSY',message:'عملية أخرى جارية؛ أعد المحاولة بنفس الطلب'}});
@@ -54,14 +55,23 @@ export async function createApp(service:Inventory,config:HttpConfig){
  }
  @Module({controllers:[Api]}) class AppModule{}
  const app=await NestFactory.create(AppModule,{logger:false,bodyParser:false});
- app.use(express.json({limit:'2mb',strict:true}));app.use((req:Request,res:Response,next:()=>void)=>{
+ app.use((req:Request,res:Response,next:()=>void)=>{
+  try{decodeURI(req.url);}catch{req.url=req.url.replace(/%(?![0-9a-fA-F]{2})/g,'%25');}
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Frame-Options','DENY');
   res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
   if(req.path.includes('/v1/'))res.setHeader('Cache-Control','no-store');next();
  });
+ app.use(express.json({limit:'2mb',strict:true}));
  if(base)app.setGlobalPrefix(base.slice(1));app.useGlobalFilters(new Errors());
  const docs=new DocumentBuilder().setTitle('TITAN INVENTORY').setVersion('0.1.0').addCookieAuth('titan_inventory').build();
  SwaggerModule.setup(base+'/api-docs',app,inventoryOpenAPI(SwaggerModule.createDocument(app,docs),base));
- if(config.publicDir)app.use(base+'/',express.static(resolve(config.publicDir),{index:'index.html',dotfiles:'deny',fallthrough:true}));
+ if(config.publicDir){
+  const pub=resolve(config.publicDir),idx=resolve(pub,'index.html');
+  app.use(base+'/',express.static(pub,{index:'index.html',dotfiles:'deny',fallthrough:true}));
+  app.use((req:Request,res:Response,next:()=>void)=>{
+   if(req.method==='GET'&&!req.path.includes('/v1/')&&!req.path.includes('/api-docs'))return res.sendFile(idx);
+   next();
+  });
+ }
  await app.init();return app;
 }

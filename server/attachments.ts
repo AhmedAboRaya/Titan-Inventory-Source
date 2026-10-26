@@ -32,7 +32,13 @@ export class Attachments{
    const path=resolve(this.root,row.path+(q.thumbnail==='1'&&row.mime.startsWith('image/')?'.thumb.webp':''));if(!path.startsWith(this.root+sep))fail('PATH','مسار مرفق غير صالح');
    const bytes=await readFile(path);return{id:row.id,filename:row.filename,mime:row.mime,bytes:bytes.length,data:bytes.toString('base64')};
   }
-  if(!q.item_id&&!q.document_id)fail('REFERENCE','حدد الصنف أو المستند');const scope={item_id:q.item_id?uuid.parse(q.item_id):undefined,document_id:q.document_id?uuid.parse(q.document_id):undefined};await this.authorize(tx,a,scope);
+  if(!q.item_id&&!q.document_id)fail('REFERENCE','حدد الصنف أو المستند');
+  let itemId=q.item_id;
+  if(itemId&&!uuid.safeParse(itemId).success){
+   const item=await one(tx,'SELECT id FROM items WHERE sku=$1',[itemId]);
+   itemId=item?.id||null;
+  }
+  const scope={item_id:itemId?uuid.parse(itemId):undefined,document_id:q.document_id?uuid.parse(q.document_id):undefined};await this.authorize(tx,a,scope);
   return(await tx.query(`SELECT at.id,at.item_id,at.document_id,at.warehouse_id,at.filename,at.mime,at.bytes,at.sha256,at.primary_image FROM attachments at LEFT JOIN documents d ON d.id=at.document_id
    WHERE ($1::uuid IS NULL OR at.item_id=$1) AND ($2::uuid IS NULL OR at.document_id=$2)
    AND ($3::uuid[] IS NULL OR at.warehouse_id IS NULL OR at.warehouse_id=ANY($3))

@@ -1,12 +1,16 @@
 import { SQL, one } from './db';
-import { Actor, permit, warehouse, department, fail, z, text, uuid, nullableId, decimal, qty, Decimal, json, visible, date } from './common';
+import { Actor, permit, warehouse, department, fail, z, text, uuid, nullableId, decimal, qty, Decimal, json, visible, date, resolveItemId } from './common';
 export const units=['Piece','Kg','Gram','Liter','Meter','Roll','Bag','Bottle','Box','Set','Bar'] as const;
 export class Catalog {
  async list(tx:SQL,a:Actor,kind:string,q:Record<string,string>={}){
   permit(a,'catalog.read');
   if(q.warehouse_id)warehouse(a,uuid.parse(q.warehouse_id));
   const scope=q.warehouse_id?[q.warehouse_id]:(a.all_warehouses?null:a.warehouse_ids);
-  if(kind==='warehouses')return (await tx.query('SELECT * FROM warehouses WHERE active AND ($1::uuid[] IS NULL OR id=ANY($1)) ORDER BY name',[scope])).rows;
+  if(kind==='warehouses')return (await tx.query(`SELECT w.*,
+   (SELECT count(*)::int FROM locations l WHERE l.warehouse_id=w.id AND l.active) location_count,
+   (SELECT count(DISTINCT b.item_id)::int FROM balances b WHERE b.warehouse_id=w.id AND b.quantity > 0) item_count,
+   (SELECT count(*)::int FROM documents d WHERE d.warehouse_id=w.id OR d.destination_warehouse_id=w.id) document_count
+   FROM warehouses w WHERE ($2::boolean OR w.active) AND ($1::uuid[] IS NULL OR w.id=ANY($1)) ORDER BY w.name`,[scope,q.all==='true'||q.include_inactive==='true'])).rows;
   if(kind==='locations')return (await tx.query('SELECT * FROM locations WHERE active AND ($1::uuid[] IS NULL OR warehouse_id=ANY($1)) ORDER BY name',[scope])).rows;
   if(kind==='categories'){
    const rows=(await tx.query(`SELECT c.*, (SELECT count(*)::int FROM categories sub WHERE sub.parent_id=c.id AND sub.active) subcategory_count,
@@ -20,6 +24,7 @@ export class Catalog {
   }
   if(kind==='items'){
    const limit=Math.min(100,Math.max(1,Number(q.limit)||40)),offset=Math.max(0,Math.min(100000,Number(q.offset)||0));
+   const inWarehouseOnly=q.in_warehouse==='true';
    return visible((await tx.query(`SELECT i.*, c.illustration, costs.last_price,CASE WHEN costs.unpriced_quantity=0 AND costs.quantity>0 THEN costs.value/costs.quantity END average_cost,
     COALESCE((SELECT sum(b.quantity-b.reserved) FROM balances b LEFT JOIN lots l ON l.id=b.lot_id WHERE b.item_id=i.id AND b.quality='Accepted' AND b.condition<>'Repair' AND b.condition<>'Damaged' AND b.holder_id IS NULL AND b.transit_id IS NULL AND (l.expires_on IS NULL OR l.expires_on>=CURRENT_DATE) AND ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1))),0) available,
     COALESCE((SELECT sum(b.reserved) FROM balances b WHERE b.item_id=i.id AND ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1))),0) reserved,
@@ -27,24 +32,28 @@ export class Catalog {
     (SELECT id FROM attachments at WHERE at.item_id=i.id AND at.primary_image AND at.document_id IS NULL AND at.warehouse_id IS NULL LIMIT 1) image_id
     FROM items i JOIN categories c ON c.id=i.category_id LEFT JOIN costs ON costs.item_id=i.id WHERE i.active AND ($2::uuid IS NULL OR i.category_id=$2 OR c.parent_id=$2)
     AND ($3='' OR concat_ws(' ',i.sku,i.name_ar,i.name_en,i.brand,i.specification) ILIKE '%'||$3||'%' OR EXISTS(SELECT 1 FROM item_codes ic WHERE ic.item_id=i.id AND ic.code ILIKE '%'||$3||'%'))
-    ORDER BY i.sku LIMIT $4 OFFSET $5`,[scope,q.category_id?uuid.parse(q.category_id):null,(q.search||'').slice(0,120),limit,offset])).rows,a);
+    AND (NOT $6::boolean OR $1::uuid[] IS NULL OR EXISTS(SELECT 1 FROM balances b WHERE b.item_id=i.id AND b.warehouse_id=ANY($1)))
+    ORDER BY i.sku LIMIT $4 OFFSET $5`,[scope,q.category_id?uuid.parse(q.category_id):null,(q.search||'').slice(0,120),limit,offset,inWarehouseOnly])).rows,a);
   }
-  if(kind==='masters')return(await tx.query('SELECT * FROM masters WHERE active AND ($1=\'\' OR kind=$1) ORDER BY name',[(q.kind||'').slice(0,30)])).rows;
-  if(kind==='lots')return(await tx.query('SELECT * FROM lots WHERE item_id=$1 ORDER BY received_on DESC',[uuid.parse(q.item_id)])).rows;
+  if(kind==='masters')return(await tx.query("SELECT * FROM masters WHERE ($2::boolean OR active) AND ($1='' OR kind=$1) ORDER BY name",[(q.kind||'').slice(0,30),q.all==='true'||q.include_inactive==='true'])).rows;
+  if(kind==='lots')return(await tx.query('SELECT * FROM lots WHERE item_id=$1 ORDER BY received_on DESC',[await resolveItemId(tx,q.item_id)])).rows;
   fail('NOT_FOUND','غير موجود',404);
  }
  async item(tx:SQL,a:Actor,id:string){
-  permit(a,'catalog.read');const item=await one(tx,'SELECT i.*,c.name_ar category_name FROM items i JOIN categories c ON c.id=i.category_id WHERE i.id=$1',[uuid.parse(id)]);if(!item)fail('NOT_FOUND','الصنف غير موجود',404);
+  permit(a,'catalog.read');
+  const isUuid=z.string().uuid().safeParse(id).success;
+  const item=await one(tx,`SELECT i.*,c.name_ar category_name FROM items i JOIN categories c ON c.id=i.category_id WHERE ${isUuid?'i.id=$1':'i.sku=$1'}`,[id]);
+  if(!item)fail('NOT_FOUND','الصنف غير موجود',404);
   const scope=a.all_warehouses?null:a.warehouse_ids;
-  const positions=(await tx.query(`SELECT b.*,w.name warehouse_name,l.name location_name,lot.code lot_code,lot.expires_on FROM balances b JOIN warehouses w ON w.id=b.warehouse_id LEFT JOIN locations l ON l.id=b.location_id LEFT JOIN lots lot ON lot.id=b.lot_id WHERE b.item_id=$1 AND ($2::uuid[] IS NULL OR b.warehouse_id=ANY($2)) ORDER BY w.name`,[id,scope])).rows;
-  const costs=await one(tx,'SELECT quantity,value,unpriced_quantity,last_price,CASE WHEN unpriced_quantity=0 AND quantity>0 THEN value/quantity END average_cost FROM costs WHERE item_id=$1',[id]);
+  const positions=(await tx.query(`SELECT b.*,w.name warehouse_name,l.name location_name,lot.code lot_code,lot.expires_on FROM balances b JOIN warehouses w ON w.id=b.warehouse_id LEFT JOIN locations l ON l.id=b.location_id LEFT JOIN lots lot ON lot.id=b.lot_id WHERE b.item_id=$1 AND ($2::uuid[] IS NULL OR b.warehouse_id=ANY($2)) ORDER BY w.name`,[item.id,scope])).rows;
+  const costs=await one(tx,'SELECT quantity,value,unpriced_quantity,last_price,CASE WHEN unpriced_quantity=0 AND quantity>0 THEN value/quantity END average_cost FROM costs WHERE item_id=$1',[item.id]);
   if(costs&&!a.all_warehouses){
    const allowedQuantity=positions.reduce((sum:any,p:any)=>sum.add(p.quantity),new Decimal(0));
    const fraction=new Decimal(costs.quantity).gt(0)?allowedQuantity.div(costs.quantity):new Decimal(0);
    costs.quantity=allowedQuantity.toFixed(6);costs.value=new Decimal(costs.value).mul(fraction).toFixed(9);costs.unpriced_quantity=new Decimal(costs.unpriced_quantity).mul(fraction).toFixed(6);
   }
-  const conversions=(await tx.query('SELECT * FROM conversions WHERE item_id=$1',[id])).rows;
-  const codes=(await tx.query('SELECT code,kind,supplier_id FROM item_codes WHERE item_id=$1',[id])).rows;
+  const conversions=(await tx.query('SELECT * FROM conversions WHERE item_id=$1',[item.id])).rows;
+  const codes=(await tx.query('SELECT code,kind,supplier_id FROM item_codes WHERE item_id=$1',[item.id])).rows;
   return visible({...item,positions,conversions,codes,...(a.permissions.includes('cost.read')?{costs:costs||null}:{})},a);
  }
  async save(tx:SQL,a:Actor,kind:string,body:unknown,id?:string){
@@ -83,5 +92,28 @@ export class Catalog {
    id=(await tx.query('INSERT INTO lots(item_id,code,supplier_id,manufactured_on,expires_on,notes) VALUES($1,$2,$3,$4,$5,$6) RETURNING id',[b.item_id,b.code,b.supplier_id||null,b.manufactured_on||null,b.expires_on||null,b.notes])).rows[0].id;
   } else fail('NOT_FOUND','غير موجود',404);
   await tx.query('INSERT INTO changes(entity,entity_id) VALUES($1,$2)',[kind,id]);await tx.query('INSERT INTO audit(user_id,action,target) VALUES($1,$2,$3)',[a.id,kind+'.save',id]);return{id};
+ }
+ async delete(tx:SQL,a:Actor,kind:string,id:string){
+  permit(a,kind==='warehouses'||kind==='locations'?'settings':'catalog.write');
+  uuid.parse(id);
+  if(kind==='masters'){
+   const m=await one(tx,'SELECT * FROM masters WHERE id=$1',[id]);
+   if(!m)fail('NOT_FOUND','السجل غير موجود',404);
+   if(m.kind==='department'){
+    if(await one(tx,"SELECT 1 FROM masters WHERE kind='employee' AND data->>'department_id'=$1",[id]))fail('HAS_CHILDREN','لا يمكن حذف القسم لوجود موظفين مسجلين به. يمكنك إيقاف تفعيله أو نقل الموظفين أولاً.',409);
+    if(await one(tx,'SELECT 1 FROM documents WHERE department_id=$1',[id]))fail('HAS_DOCUMENTS','لا يمكن حذف القسم لوجود حركات مخزنية مسجلة به. يمكنك إيقاف تفعيله لحفظ سجل العمليات.',409);
+   } else if(m.kind==='employee'){
+    if(await one(tx,'SELECT 1 FROM documents WHERE recipient_id=$1',[id]))fail('HAS_DOCUMENTS','لا يمكن حذف الموظف لوجود حركات مسجلة باسمه. يمكنك إيقاف تفعيله لحفظ سجل العمليات.',409);
+    if(await one(tx,'SELECT 1 FROM custody WHERE holder_id=$1',[id]))fail('HAS_CUSTODY','لا يمكن حذف الموظف لوجود عهد مرتبطة به. يمكنك إيقاف تفعيله.',409);
+    if(await one(tx,'SELECT 1 FROM balances WHERE holder_id=$1',[id]))fail('HAS_BALANCES','لا يمكن حذف الموظف لوجود أرصدة عهد مسجلة باسمه.',409);
+   } else {
+    if(await one(tx,'SELECT 1 FROM documents WHERE department_id=$1 OR recipient_id=$1 OR machine_id=$1 OR supplier_id=$1',[id]))fail('HAS_DOCUMENTS','لا يمكن حذف هذا السجل لارتباطه بحركات مخزنية. يمكنك إيقاف تفعيله.',409);
+   }
+   await tx.query('DELETE FROM masters WHERE id=$1',[id]);
+   await tx.query('INSERT INTO changes(entity,entity_id) VALUES($1,$2)',[kind,id]);
+   await tx.query('INSERT INTO audit(user_id,action,target) VALUES($1,$2,$3)',[a.id,kind+'.delete',id]);
+   return{ok:true,id};
+  }
+  fail('NOT_SUPPORTED','الحذف غير متاح لهذا العنصر',400);
  }
 }
