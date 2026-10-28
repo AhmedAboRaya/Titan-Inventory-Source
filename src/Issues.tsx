@@ -125,6 +125,12 @@ export function Issues({ forceNew }: { forceNew?: boolean }) {
         >
           {t('سجل وأرشيف أذون الصرف', 'Issue Vouchers Archive')}
         </button>
+        <button
+          type="button"
+          onClick={() => navigate('/returns/new?type=return')}
+        >
+          ↩ {t('إذن استرجاع مواد من قسم', 'Return from Department')}
+        </button>
       </div>
 
       {viewTab === 'new' ? (
@@ -890,6 +896,7 @@ function IssueVoucherDetail({
 }) {
   const t = useText();
   const app = useApp();
+  const navigate = useNavigate();
 
   const dept = departments.find(d => d.id === doc.department_id);
   const emp = employees.find(e => e.id === doc.recipient_id);
@@ -984,6 +991,16 @@ function IssueVoucherDetail({
       </div>
 
       <div className="actions">
+        {doc.status === 'Posted' && (
+          <button
+            type="button"
+            className="primary"
+            style={{ backgroundColor: 'var(--success, #16a34a)', borderColor: 'var(--success, #16a34a)' }}
+            onClick={() => navigate(`/returns/new?type=return&refId=${doc.id}`)}
+          >
+            ↩ {t('استرجاع مواد للمخزن من هذا الإذن', 'Return items to warehouse')}
+          </button>
+        )}
         <button onClick={() => window.print()}>
           <Icon name="chart" /> {t('طباعة إذن الصرف', 'Print Voucher')}
         </button>

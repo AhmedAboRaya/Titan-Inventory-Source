@@ -113,6 +113,12 @@ export function Purchases({ forceNew }: { forceNew?: boolean }) {
         >
           {t('سجل وأرشيف المشتريات', 'Purchases History')}
         </button>
+        <button
+          type="button"
+          onClick={() => navigate('/returns/new?type=supplier_return')}
+        >
+          ↩ {t('إرجاع بضاعة لمورد / شركة', 'Return to Supplier')}
+        </button>
       </div>
 
       {viewTab === 'new' ? (
@@ -1080,6 +1086,7 @@ function PurchaseReceiptDetail({
 }) {
   const t = useText();
   const app = useApp();
+  const navigate = useNavigate();
   const canCost = usePermission('cost.read');
   const supplier = suppliers.find(s => s.id === doc.supplier_id);
 
@@ -1142,6 +1149,16 @@ function PurchaseReceiptDetail({
       )}
 
       <div className="actions">
+        {doc.status === 'Posted' && (
+          <button
+            type="button"
+            className="secondary"
+            style={{ borderColor: 'var(--amber, #f59e0b)', color: 'var(--amber, #f59e0b)' }}
+            onClick={() => navigate(`/returns/new?type=supplier_return&refId=${doc.id}`)}
+          >
+            ↩ {t('إرجاع بضاعة / مرتجع للمورد من هذا الإذن', 'Create Supplier Return')}
+          </button>
+        )}
         <button onClick={() => window.print()}>
           <Icon name="chart" /> {t('طباعة إذن الاستلام', 'Print Receipt')}
         </button>
