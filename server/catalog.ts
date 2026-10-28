@@ -37,6 +37,8 @@ export class Catalog {
   }
   if(kind==='masters')return(await tx.query("SELECT * FROM masters WHERE ($2::boolean OR active) AND ($1='' OR kind=$1) ORDER BY name",[(q.kind||'').slice(0,30),q.all==='true'||q.include_inactive==='true'])).rows;
   if(kind==='lots')return(await tx.query('SELECT * FROM lots WHERE item_id=$1 ORDER BY received_on DESC',[await resolveItemId(tx,q.item_id)])).rows;
+  if(kind==='item-levels'||kind==='item_levels')return(await tx.query('SELECT l.*,w.name warehouse_name,i.sku,i.name_ar FROM item_levels l JOIN warehouses w ON w.id=l.warehouse_id JOIN items i ON i.id=l.item_id WHERE ($1::uuid IS NULL OR l.item_id=$1)',[q.item_id?await resolveItemId(tx,q.item_id):null])).rows;
+  if(kind==='conversions')return(await tx.query('SELECT * FROM conversions WHERE ($1::uuid IS NULL OR item_id=$1)',[q.item_id?await resolveItemId(tx,q.item_id):null])).rows;
   fail('NOT_FOUND','غير موجود',404);
  }
  async item(tx:SQL,a:Actor,id:string){
@@ -54,7 +56,8 @@ export class Catalog {
   }
   const conversions=(await tx.query('SELECT * FROM conversions WHERE item_id=$1',[item.id])).rows;
   const codes=(await tx.query('SELECT code,kind,supplier_id FROM item_codes WHERE item_id=$1',[item.id])).rows;
-  return visible({...item,positions,conversions,codes,...(a.permissions.includes('cost.read')?{costs:costs||null}:{})},a);
+  const levels=(await tx.query(`SELECT l.*,w.name warehouse_name FROM item_levels l JOIN warehouses w ON w.id=l.warehouse_id WHERE l.item_id=$1 AND ($2::uuid[] IS NULL OR l.warehouse_id=ANY($2)) ORDER BY w.name`,[item.id,scope])).rows;
+  return visible({...item,positions,conversions,codes,levels,...(a.permissions.includes('cost.read')?{costs:costs||null}:{})},a);
  }
  async save(tx:SQL,a:Actor,kind:string,body:unknown,id?:string){
   permit(a,kind==='warehouses'||kind==='locations'?'settings':'catalog.write');
@@ -90,6 +93,14 @@ export class Catalog {
    const b=z.object({item_id:uuid,code:text,supplier_id:nullableId,manufactured_on:date.nullable().optional(),expires_on:date.nullable().optional(),notes:z.string().max(2000).default('')}).strict().parse(body);
    const item=await one(tx,'SELECT * FROM items WHERE id=$1 AND active',[b.item_id]);if(!item||!item.track_lot)fail('LOT','الصنف لا يتتبع لوت');if(item.track_expiry&&!b.expires_on)fail('EXPIRY','الصلاحية مطلوبة');if(b.expires_on&&b.manufactured_on&&b.expires_on<b.manufactured_on)fail('EXPIRY','الصلاحية قبل التصنيع');
    id=(await tx.query('INSERT INTO lots(item_id,code,supplier_id,manufactured_on,expires_on,notes) VALUES($1,$2,$3,$4,$5,$6) RETURNING id',[b.item_id,b.code,b.supplier_id||null,b.manufactured_on||null,b.expires_on||null,b.notes])).rows[0].id;
+  } else if(kind==='item-levels'||kind==='item_levels'){
+   const b=z.object({item_id:uuid,warehouse_id:uuid,minimum:decimal.default('0'),reorder:decimal.default('0'),target:decimal.default('0')}).strict().parse(body);
+   await tx.query('INSERT INTO item_levels(item_id,warehouse_id,minimum,reorder,target) VALUES($1,$2,$3,$4,$5) ON CONFLICT(item_id,warehouse_id) DO UPDATE SET minimum=EXCLUDED.minimum,reorder=EXCLUDED.reorder,target=EXCLUDED.target',[b.item_id,b.warehouse_id,b.minimum,b.reorder,b.target]);
+   id=b.item_id;
+  } else if(kind==='item-codes'||kind==='item_codes'){
+   const b=z.object({item_id:uuid,code:text,kind:z.enum(['legacy','supplier','barcode']),supplier_id:nullableId}).strict().parse(body);
+   await tx.query('INSERT INTO item_codes(item_id,code,kind,supplier_id) VALUES($1,$2,$3,$4) ON CONFLICT(item_id,code,kind) DO NOTHING',[b.item_id,b.code,b.kind,b.supplier_id||null]);
+   id=b.item_id;
   } else fail('NOT_FOUND','غير موجود',404);
   await tx.query('INSERT INTO changes(entity,entity_id) VALUES($1,$2)',[kind,id]);await tx.query('INSERT INTO audit(user_id,action,target) VALUES($1,$2,$3)',[a.id,kind+'.save',id]);return{id};
  }

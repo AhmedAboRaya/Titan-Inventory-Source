@@ -484,7 +484,7 @@ function TransferForm({
   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const urlSource = searchParams.get('source') || '';
   const urlTarget = searchParams.get('target') || '';
-  const urlItem = searchParams.get('item') || '';
+  const urlItem = searchParams.get('item_id') || searchParams.get('item') || '';
   const urlLot = searchParams.get('lot') || '';
 
   // Source warehouse
@@ -700,7 +700,7 @@ function TransferForm({
             </div>
 
             <div className="wh-flow-arrow">
-              <span className="arrow-icon">➔</span>
+              <span className="arrow-icon">{app.lang === 'ar' ? '⬅' : '➔'}</span>
               <small>{t('تحويل فوري', 'Direct Move')}</small>
             </div>
 
@@ -852,7 +852,7 @@ function TransferForm({
           </div>
           <div className="summary-stat">
             <span className="summary-label">{t('مسار الحركة', 'Movement Route')}</span>
-            <b className="summary-val summary-route">{sourceName} ➔ {destName}</b>
+            <b className="summary-val summary-route">{sourceName} {app.lang === 'ar' ? '⬅' : '➔'} {destName}</b>
           </div>
         </div>
 

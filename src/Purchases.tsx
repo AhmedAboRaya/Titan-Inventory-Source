@@ -436,10 +436,14 @@ function PurchaseReceiptForm({
   const [exchangeRate, setExchangeRate] = useState('1');
   const [notes, setNotes] = useState('');
 
+  const initialItemId = useMemo(() => {
+    return new URLSearchParams(location.search).get('item_id') || '';
+  }, [location.search]);
+
   // Purchase items (lines)
   const [lines, setLines] = useState<PurchaseLine[]>([
     {
-      item_id: '',
+      item_id: initialItemId,
       quantity: '',
       unit: 'Piece',
       unit_cost: '',

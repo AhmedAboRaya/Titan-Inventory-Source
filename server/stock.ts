@@ -22,7 +22,10 @@ export class Stock {
   const deptId=q.department_id?uuid.parse(q.department_id):null;
   const recId=q.recipient_id?uuid.parse(q.recipient_id):null;
   const docType=q.type||'';
-  return visible((await tx.query(`SELECT d.*,u.display_name creator_name,m.name recipient_name,m.data->>'badge' recipient_badge,m.data->>'job_title' recipient_job,dep.name department_name, (SELECT count(*)::int FROM document_lines l WHERE l.document_id=d.id) lines_count FROM documents d JOIN users u ON u.id=d.created_by
+  return visible((await tx.query(`SELECT d.*,u.display_name creator_name,m.name recipient_name,m.data->>'badge' recipient_badge,m.data->>'job_title' recipient_job,dep.name department_name,
+   (SELECT count(*)::int FROM document_lines l WHERE l.document_id=d.id) lines_count,
+   (SELECT string_agg(concat_ws(' ', i.sku, i.name_ar, i.name_en), ' ') FROM document_lines l JOIN items i ON i.id=l.item_id WHERE l.document_id=d.id) items_summary
+   FROM documents d JOIN users u ON u.id=d.created_by
    LEFT JOIN masters m ON m.id=d.recipient_id LEFT JOIN masters dep ON dep.id=d.department_id
    WHERE ($1::uuid[] IS NULL OR (d.warehouse_id=ANY($1) AND (d.destination_warehouse_id IS NULL OR d.destination_warehouse_id=ANY($1))))
    AND ($2::uuid[] IS NULL OR d.department_id IS NULL OR d.department_id=ANY($2))

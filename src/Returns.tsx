@@ -314,18 +314,21 @@ function ReturnForm({
   // ==========================================================================
   // DISCOVERY & FILTER STATES (خيارات البحث والتصفية المتعددة)
   // ==========================================================================
+  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const initialSku = searchParams.get('sku') || '';
+
   // For Issue Returns:
-  const [issueLookupTab, setIssueLookupTab] = useState<'voucher' | 'smart_item'>('voucher');
+  const [issueLookupTab, setIssueLookupTab] = useState<'voucher' | 'smart_item'>(initialSku ? 'smart_item' : 'voucher');
   const [voucherSearchText, setVoucherSearchText] = useState('');
   const [voucherDeptFilter, setVoucherDeptFilter] = useState('');
   const [voucherEmpFilter, setVoucherEmpFilter] = useState('');
-  const [smartSearchItemText, setSmartSearchItemText] = useState('');
+  const [smartSearchItemText, setSmartSearchItemText] = useState(initialSku);
 
   // For Supplier Returns:
   const [supFilter, setSupFilter] = useState('');
   const [invoiceSearchText, setInvoiceSearchText] = useState('');
   const [docNumSearchText, setDocNumSearchText] = useState('');
-  const [lotSearchText, setLotSearchText] = useState('');
+  const [lotSearchText, setLotSearchText] = useState(initialSku);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
@@ -414,20 +417,21 @@ function ReturnForm({
   // Filtered candidate issues for return
   const filteredCandidateIssues = useMemo(() => {
     if (!postedIssuesRes.data) return [];
+    const activeSearch = (issueLookupTab === 'smart_item' ? smartSearchItemText : voucherSearchText).trim().toLowerCase();
     return postedIssuesRes.data.filter(d => {
       if (voucherDeptFilter && d.department_id !== voucherDeptFilter) return false;
       if (voucherEmpFilter && d.recipient_id !== voucherEmpFilter) return false;
-      if (voucherSearchText) {
-        const q = voucherSearchText.toLowerCase();
-        const numMatch = String(d.number || '').toLowerCase().includes(q);
-        const reasonMatch = String(d.reason || '').toLowerCase().includes(q);
-        const recMatch = String(d.recipient_name || '').toLowerCase().includes(q);
-        const deptMatch = String(d.department_name || '').toLowerCase().includes(q);
-        if (!numMatch && !reasonMatch && !recMatch && !deptMatch) return false;
+      if (activeSearch) {
+        const numMatch = String(d.number || '').toLowerCase().includes(activeSearch);
+        const reasonMatch = String(d.reason || '').toLowerCase().includes(activeSearch);
+        const recMatch = String(d.recipient_name || '').toLowerCase().includes(activeSearch);
+        const deptMatch = String(d.department_name || '').toLowerCase().includes(activeSearch);
+        const itemMatch = String(d.items_summary || '').toLowerCase().includes(activeSearch);
+        if (!numMatch && !reasonMatch && !recMatch && !deptMatch && !itemMatch) return false;
       }
       return true;
     });
-  }, [postedIssuesRes.data, voucherDeptFilter, voucherEmpFilter, voucherSearchText]);
+  }, [postedIssuesRes.data, voucherDeptFilter, voucherEmpFilter, voucherSearchText, smartSearchItemText, issueLookupTab]);
 
   // Filtered candidate receipts for supplier return
   const filteredCandidateReceipts = useMemo(() => {
@@ -443,7 +447,8 @@ function ReturnForm({
         const lotQ = lotSearchText.toLowerCase();
         const inNotes = String(d.notes || '').toLowerCase().includes(lotQ);
         const inReason = String(d.reason || '').toLowerCase().includes(lotQ);
-        if (!inNotes && !inReason) return false;
+        const inItems = String(d.items_summary || '').toLowerCase().includes(lotQ);
+        if (!inNotes && !inReason && !inItems) return false;
       }
       if (dateFrom && String(d.document_date).slice(0, 10) < dateFrom) return false;
       if (dateTo && String(d.document_date).slice(0, 10) > dateTo) return false;
@@ -774,6 +779,11 @@ function ReturnForm({
                               <div className="candidate-lines-badge">
                                 {v.lines_count || 1} {t('أصناف مصروفة', 'issued items')}
                               </div>
+                              {v.items_summary && (
+                                <div className="candidate-items-preview" style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '6px', background: '#f8fafc', padding: '4px 8px', borderRadius: '4px', border: '1px dashed #cbd5e1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.items_summary}>
+                                  📦 {v.items_summary}
+                                </div>
+                              )}
                             </div>
 
                             <button
@@ -904,6 +914,11 @@ function ReturnForm({
                                 <div className="candidate-lines-badge">
                                   {r.lines_count || 1} {t('أصناف مستلمة', 'received items')}
                                 </div>
+                                {r.items_summary && (
+                                  <div className="candidate-items-preview" style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '6px', background: '#f8fafc', padding: '4px 8px', borderRadius: '4px', border: '1px dashed #cbd5e1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={r.items_summary}>
+                                    📦 {r.items_summary}
+                                  </div>
+                                )}
                               </div>
 
                               <button

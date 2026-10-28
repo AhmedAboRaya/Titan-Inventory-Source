@@ -80,6 +80,14 @@ export function ItemPicker({
   const selectedItemRes = useData<Row>(value ? `items/${encodeURIComponent(value)}` : null);
   const currentItem = selectedItemRes.data;
 
+  const notifiedIdRef = useRef<string>('');
+  useEffect(() => {
+    if (currentItem && value && notifiedIdRef.current !== value) {
+      notifiedIdRef.current = value;
+      onChange(value, currentItem);
+    }
+  }, [currentItem, value]);
+
   // When currentItem is loaded, sync category dropdowns so they reflect the selected item's category
   useEffect(() => {
     if (currentItem && currentItem.category_id && allCategories.length > 0) {
@@ -222,19 +230,19 @@ export function ItemPicker({
                 required={required}
                 className={error ? 'input-error' : ''}
                 value={value}
-                disabled={!selectedMainCat}
+                disabled={!selectedMainCat && !currentItem}
                 onChange={e => {
                   const itemId = e.target.value;
-                  const found = (catItemsRes.data || []).find(i => i.id === itemId);
+                  const found = (catItemsRes.data || []).find(i => i.id === itemId) || (currentItem?.id === itemId ? currentItem : undefined);
                   onChange(itemId, found);
                 }}
               >
                 <option value="">
-                  {!selectedMainCat
+                  {!selectedMainCat && !currentItem
                     ? t('حدد التصنيف لإظهار الأصناف', 'Choose category to list items')
                     : catItemsRes.loading
                     ? t('جارٍ تحميل الأصناف…', 'Loading items…')
-                    : (catItemsRes.data?.length || 0) === 0
+                    : (catItemsRes.data?.length || 0) === 0 && !currentItem
                     ? t('لا توجد أصناف في هذا التصنيف', 'No items in this category')
                     : t('— اختر الصنف —', '— Choose item —')}
                 </option>

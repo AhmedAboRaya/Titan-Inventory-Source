@@ -344,11 +344,15 @@ function IssueVoucherForm({
   const [documentDate, setDocumentDate] = useState(() => new Date().toLocaleDateString('en-CA'));
   const [reason, setReason] = useState('');
   const [notes, setNotes] = useState('');
+  const location = useLocation();
+  const initialItemId = useMemo(() => {
+    return new URLSearchParams(location.search).get('item_id') || '';
+  }, [location.search]);
 
   // Lines (multiple items in one voucher)
   const [lines, setLines] = useState<IssueLine[]>([
     {
-      item_id: '',
+      item_id: initialItemId,
       quantity: '',
       unit: 'Piece',
       location_id: '',

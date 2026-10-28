@@ -33,7 +33,7 @@ export class Inventory {
   if(kind==='exports')return exportReport(this,a,id||'balances',q);
   if(['purchase-orders','counts','imports'].includes(kind!))return this.workflows.read(this.db,a,kind!,id,q);
   if(kind==='serials'){permit(a,'catalog.read');const itemId=await resolveItemId(this.db,q.item_id);return(await this.db.query('SELECT * FROM serials WHERE item_id=$1',[itemId])).rows;}
-  if(kind==='item-levels'){permit(a,'catalog.read');const itemId=await resolveItemId(this.db,q.item_id);return(await this.db.query('SELECT * FROM item_levels WHERE item_id=$1 AND ($2::uuid[] IS NULL OR warehouse_id=ANY($2))',[itemId,a.all_warehouses?null:a.warehouse_ids])).rows;}
+  if(kind==='item-levels'){permit(a,'catalog.read');const itemId=q.item_id?await resolveItemId(this.db,q.item_id):null;return(await this.db.query('SELECT * FROM item_levels WHERE ($1::uuid IS NULL OR item_id=$1) AND ($2::uuid[] IS NULL OR warehouse_id=ANY($2))',[itemId,a.all_warehouses?null:a.warehouse_ids])).rows;}
   if(kind==='users')return this.auth.users(a);
   if(kind==='roles'){permit(a,'users');return(await this.db.query('SELECT * FROM roles ORDER BY name')).rows;}
   if(kind==='sessions'){return(await this.db.query('SELECT token_hash AS id,device,created_at,last_seen,expires_at,revoked FROM sessions WHERE user_id=$1 ORDER BY created_at DESC',[a.id])).rows;}
@@ -49,11 +49,11 @@ export class Inventory {
  async mutate(a:Actor,key:string,path:string,body:any,sessionHash?:string){
   return this.write(a,key,path,body,async(tx,current)=>{
    const [kind,id,action]=path.split('/').filter(Boolean);
-   if(['warehouses','locations','categories','items','masters','lots','conversions'].includes(kind!)){if(action==='delete'&&id)return this.catalog.delete(tx,current,kind!,id);return this.catalog.save(tx,current,kind!,body,id);}
+   if(['warehouses','locations','categories','items','masters','lots','conversions','item-levels','item-codes'].includes(kind!)){if(action==='delete'&&id)return this.catalog.delete(tx,current,kind!,id);return this.catalog.save(tx,current,kind!,body,id);}
    if(kind==='users')return this.auth.saveUser(tx,current,body,id);
    if(kind==='roles')return this.auth.saveRole(tx,current,body);
    if(kind==='attachments')return this.attachments.upload(tx,current,body);
-   if(['purchase-orders','counts','imports','serials','item-levels','item-codes','settings'].includes(kind!))return this.workflows.mutate(tx,current,kind!,id,action,body);
+   if(['purchase-orders','counts','imports','serials','settings'].includes(kind!))return this.workflows.mutate(tx,current,kind!,id,action,body);
    if(kind==='sessions'&&id&&action==='revoke'){await tx.query('UPDATE sessions SET revoked=true WHERE user_id=$1 AND token_hash=$2',[a.id,id]);return{ok:true};}
    if(kind==='documents'){
     if(action==='reverse')return this.stock.reverse(tx,current,id!,body.reason,z.number().int().positive().parse(body.version));
@@ -85,6 +85,57 @@ export class Inventory {
   const pending=await one(this.db,`SELECT count(*)::int n FROM documents WHERE status IN ('Submitted','Pending Approval') AND ($1::uuid[] IS NULL OR warehouse_id=ANY($1)) AND ($2::uuid[] IS NULL OR department_id IS NULL OR department_id=ANY($2))`,[scope,a.all_departments?null:a.department_ids]);
   const financial=a.permissions.includes('cost.read')?await one(this.db,`SELECT sum(CASE WHEN b.holder_id IS NULL AND b.transit_id IS NULL AND c.quantity>0 AND c.unpriced_quantity=0 THEN b.quantity*c.value/c.quantity ELSE 0 END) stock_value,sum(CASE WHEN b.holder_id IS NOT NULL AND c.quantity>0 AND c.unpriced_quantity=0 THEN b.quantity*c.value/c.quantity ELSE 0 END) custody_value,count(DISTINCT CASE WHEN c.unpriced_quantity>0 THEN b.item_id END)::int unpriced_items FROM balances b JOIN costs c ON c.item_id=b.item_id WHERE b.quantity>0 AND ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1))`,[scope]):undefined;
   const movement=(await this.db.query(`SELECT d.document_date,d.type,i.base_unit,sum(l.quantity) quantity${a.permissions.includes('cost.read')?',sum(l.quantity*l.unit_cost) value':''} FROM ledger l JOIN documents d ON d.id=l.document_id JOIN balances b ON b.position_key=l.position_key JOIN items i ON i.id=b.item_id WHERE d.type IN('receipt','issue','return') AND d.document_date>=CURRENT_DATE-30 AND ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1)) AND ($2::uuid[] IS NULL OR d.department_id IS NULL OR d.department_id=ANY($2)) GROUP BY d.document_date,d.type,i.base_unit ORDER BY d.document_date`,[scope,a.all_departments?null:a.department_ids])).rows;
-  return{...counts,pending_documents:pending!.n,...(financial?{financial}:{}),movement,metrics:[{id:'stock',report:'balances'},{id:'movement',report:'ledger'},{id:'custody',report:'custody'}],as_of:new Date().toISOString(),movement_period_days:30};
+  const lowStock=(await this.db.query(`SELECT i.id, i.sku, i.name_ar, i.name_en, i.base_unit, c.name_ar category_name,
+    COALESCE(SUM(CASE WHEN b.quality='Accepted' AND b.condition NOT IN('Repair','Damaged') AND b.holder_id IS NULL AND b.transit_id IS NULL AND (lot.expires_on IS NULL OR lot.expires_on>=CURRENT_DATE) THEN b.quantity-b.reserved ELSE 0 END), 0) available,
+    MAX(levels.minimum) minimum,
+    MAX(levels.reorder) reorder,
+    MAX(levels.target) target
+    FROM item_levels levels
+    JOIN items i ON i.id=levels.item_id
+    JOIN categories c ON c.id=i.category_id
+    LEFT JOIN balances b ON b.item_id=i.id AND ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1))
+    LEFT JOIN lots lot ON lot.id=b.lot_id
+    WHERE i.active AND ($1::uuid[] IS NULL OR levels.warehouse_id=ANY($1))
+    GROUP BY i.id, i.sku, i.name_ar, i.name_en, i.base_unit, c.name_ar
+    HAVING COALESCE(SUM(CASE WHEN b.quality='Accepted' AND b.condition NOT IN('Repair','Damaged') AND b.holder_id IS NULL AND b.transit_id IS NULL AND (lot.expires_on IS NULL OR lot.expires_on>=CURRENT_DATE) THEN b.quantity-b.reserved ELSE 0 END), 0) <= MAX(levels.reorder)
+    ORDER BY (COALESCE(SUM(CASE WHEN b.quality='Accepted' AND b.condition NOT IN('Repair','Damaged') AND b.holder_id IS NULL AND b.transit_id IS NULL AND (lot.expires_on IS NULL OR lot.expires_on>=CURRENT_DATE) THEN b.quantity-b.reserved ELSE 0 END), 0) - MAX(levels.minimum)) ASC
+    LIMIT 15`,[scope])).rows;
+  const categories=(await this.db.query(`SELECT c.id, c.name_ar, c.name_en,
+    count(DISTINCT i.id)::int item_count,
+    COALESCE(sum(b.quantity), 0) total_qty
+    ${a.permissions.includes('cost.read')?', COALESCE(sum(CASE WHEN costs.unpriced_quantity=0 AND costs.quantity>0 THEN b.quantity*costs.value/costs.quantity ELSE 0 END), 0) category_value':''}
+    FROM categories c
+    JOIN items i ON (i.category_id=c.id OR i.category_id IN (SELECT id FROM categories sub WHERE sub.parent_id=c.id)) AND i.active
+    LEFT JOIN balances b ON b.item_id=i.id AND ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1))
+    ${a.permissions.includes('cost.read')?'LEFT JOIN costs ON costs.item_id=i.id':''}
+    WHERE c.parent_id IS NULL AND c.active
+    GROUP BY c.id, c.name_ar, c.name_en
+    ORDER BY item_count DESC`,[scope])).rows;
+  const recentDocs=(await this.db.query(`SELECT d.id, d.number, d.type, d.status, d.document_date, d.created_at,
+    u.display_name creator_name,
+    COALESCE(m.name, sup.name, dep.name, '—') party_name,
+    (SELECT count(*)::int FROM document_lines l WHERE l.document_id=d.id) lines_count
+    FROM documents d
+    JOIN users u ON u.id=d.created_by
+    LEFT JOIN masters m ON m.id=d.recipient_id
+    LEFT JOIN masters sup ON sup.id=d.supplier_id
+    LEFT JOIN masters dep ON dep.id=d.department_id
+    WHERE ($1::uuid[] IS NULL OR d.warehouse_id=ANY($1) OR d.destination_warehouse_id=ANY($1))
+      AND ($2::uuid[] IS NULL OR d.department_id IS NULL OR d.department_id=ANY($2))
+    ORDER BY d.created_at DESC
+    LIMIT 8`,[scope,a.all_departments?null:a.department_ids])).rows;
+  const topMoving=(await this.db.query(`SELECT i.id, i.sku, i.name_ar, i.base_unit,
+    sum(abs(l.quantity)) moved_qty,
+    count(DISTINCT d.id)::int doc_count
+    FROM ledger l
+    JOIN documents d ON d.id=l.document_id
+    JOIN balances b ON b.position_key=l.position_key
+    JOIN items i ON i.id=b.item_id
+    WHERE d.document_date >= CURRENT_DATE-30
+      AND ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1))
+    GROUP BY i.id, i.sku, i.name_ar, i.base_unit
+    ORDER BY moved_qty DESC
+    LIMIT 6`,[scope])).rows;
+  return{...counts,pending_documents:pending!.n,...(financial?{financial}:{}),movement,low_stock_items:lowStock,category_distribution:categories,recent_activity:recentDocs,top_moving_items:topMoving,metrics:[{id:'stock',report:'balances'},{id:'movement',report:'ledger'},{id:'custody',report:'custody'}],as_of:new Date().toISOString(),movement_period_days:30};
  }
 }
