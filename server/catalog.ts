@@ -5,7 +5,11 @@ export class Catalog {
  async list(tx:SQL,a:Actor,kind:string,q:Record<string,string>={}){
   permit(a,'catalog.read');
   if(q.warehouse_id)warehouse(a,uuid.parse(q.warehouse_id));
-  const scope=q.warehouse_id?[q.warehouse_id]:(a.all_warehouses?null:a.warehouse_ids);
+  let scope=q.warehouse_id?[q.warehouse_id]:(a.all_warehouses?null:a.warehouse_ids);
+  if(scope && scope.length===1){
+   const exists=await one(tx,'SELECT 1 FROM warehouses WHERE id=$1 AND active',[scope[0]]);
+   if(!exists)scope=a.all_warehouses?null:a.warehouse_ids;
+  }
   if(kind==='warehouses')return (await tx.query(`SELECT w.*,
    (SELECT count(*)::int FROM locations l WHERE l.warehouse_id=w.id AND l.active) location_count,
    (SELECT count(DISTINCT b.item_id)::int FROM balances b WHERE b.warehouse_id=w.id AND b.quantity > 0) item_count,
@@ -14,8 +18,8 @@ export class Catalog {
   if(kind==='locations')return (await tx.query('SELECT * FROM locations WHERE active AND ($1::uuid[] IS NULL OR warehouse_id=ANY($1)) ORDER BY name',[scope])).rows;
   if(kind==='categories'){
    const rows=(await tx.query(`SELECT c.*, (SELECT count(*)::int FROM categories sub WHERE sub.parent_id=c.id AND sub.active) subcategory_count,
-    (SELECT count(*)::int FROM items i WHERE i.active AND (i.category_id=c.id OR i.category_id IN(SELECT id FROM categories WHERE parent_id=c.id OR parent_id IN (SELECT id FROM categories WHERE parent_id=c.id))) AND ($1::uuid[] IS NULL OR EXISTS(SELECT 1 FROM balances b WHERE b.item_id=i.id AND b.warehouse_id=ANY($1)))) item_count
-    FROM categories c WHERE c.active ORDER BY c.sort,c.name_en`,[scope])).rows;
+    (SELECT count(*)::int FROM items i WHERE i.active AND (i.category_id=c.id OR i.category_id IN(SELECT id FROM categories WHERE parent_id=c.id OR parent_id IN (SELECT id FROM categories WHERE parent_id=c.id)))) item_count
+    FROM categories c WHERE c.active ORDER BY c.sort,c.name_en`)).rows;
    const metrics=(await tx.query(`WITH stock AS (SELECT b.item_id,b.warehouse_id,sum(CASE WHEN b.quality='Accepted' AND b.condition NOT IN('Repair','Damaged') AND b.holder_id IS NULL AND b.transit_id IS NULL AND (lot.expires_on IS NULL OR lot.expires_on>=CURRENT_DATE) THEN b.quantity-b.reserved ELSE 0 END) available FROM balances b LEFT JOIN lots lot ON lot.id=b.lot_id WHERE ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1)) GROUP BY b.item_id,b.warehouse_id)
     SELECT i.category_id,count(DISTINCT i.id)::int low_stock_count FROM item_levels levels JOIN items i ON i.id=levels.item_id LEFT JOIN stock s ON s.item_id=levels.item_id AND s.warehouse_id=levels.warehouse_id WHERE i.active AND ($1::uuid[] IS NULL OR levels.warehouse_id=ANY($1)) AND COALESCE(s.available,0)<levels.minimum GROUP BY i.category_id`,[scope])).rows;
    const values=a.permissions.includes('cost.read')?(await tx.query(`SELECT i.category_id,sum(CASE WHEN c.unpriced_quantity=0 AND c.quantity>0 THEN b.quantity*c.value/c.quantity ELSE 0 END) value,count(DISTINCT CASE WHEN b.quantity>0 AND c.unpriced_quantity>0 THEN i.id END)::int unpriced_items FROM balances b JOIN items i ON i.id=b.item_id LEFT JOIN costs c ON c.item_id=b.item_id WHERE ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1)) GROUP BY i.category_id`,[scope])).rows:[];
