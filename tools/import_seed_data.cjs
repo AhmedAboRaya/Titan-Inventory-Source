@@ -966,6 +966,42 @@ async function main() {
     console.error('Error during October movements sync:', syncErr);
   }
 
+  // ==========================================
+  // 11. CONFIGURE INTELLIGENT STOCK LEVELS
+  // ==========================================
+  try {
+    const itemsRes = await request(`${base}/items?limit=200`, { headers: authHeaders });
+    const allItems = itemsRes.body || [];
+    let levelsCount = 0;
+    for (const it of allItems) {
+      let min = '10', rop = '25', target = '100';
+      if (it.sku.startsWith('TIG') || it.sku.startsWith('BR') || it.sku.startsWith('ST')) {
+        min = '5'; rop = '15'; target = '50';
+      } else if (it.sku.includes('%') || it.sku.toLowerCase().includes('acid') || it.sku.toLowerCase().includes('alkaline')) {
+        min = '20'; rop = '40'; target = '150';
+      } else if (it.sku.startsWith('GLOVES') || it.sku.startsWith('MASK') || it.sku.startsWith('OVER')) {
+        min = '50'; rop = '100'; target = '500';
+      } else if (it.base_unit === 'Kg') {
+        min = '10'; rop = '25'; target = '100';
+      }
+
+      await request(`${base}/item-levels`, {
+        method: 'POST',
+        headers: { ...authHeaders, 'idempotency-key': crypto.randomUUID() }
+      }, {
+        item_id: it.id,
+        warehouse_id: mainWarehouse.id,
+        minimum: min,
+        reorder: rop,
+        target: target
+      });
+      levelsCount++;
+    }
+    console.log(`✓ Intelligent Stock Levels set for ${levelsCount} items in ${mainWarehouse.name}`);
+  } catch (levelErr) {
+    console.error('Error configuring stock levels:', levelErr);
+  }
+
   console.log('\n======================================================');
   console.log('✓ SEED & MIGRATION COMPLETE');
   console.log(`✓ Main Medical Warehouse: ${mainWarehouse.name} (${mainWarehouse.id})`);
