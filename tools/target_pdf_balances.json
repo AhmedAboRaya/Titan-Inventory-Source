@@ -1,0 +1,818 @@
+[
+  {
+    "sku": "A4WHITEPAP-63",
+    "name_ar": "باكت ورق تصوير A4 أبيض",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-A4WHITEPAP63",
+    "qty": 2,
+    "unit": "Piece"
+  },
+  {
+    "sku": "AB500",
+    "name_ar": "خامة أكريلونيتريل بوتادين ستايرين (ABS (5000 S",
+    "wh": "Licensed warehouse 244",
+    "lot": "AB500",
+    "qty": 6,
+    "unit": "Bag"
+  },
+  {
+    "sku": "AC100000",
+    "name_ar": "عمود أكريليك",
+    "wh": "Main Medical Warehouse",
+    "lot": "ACR0726",
+    "qty": 21,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ADP",
+    "name_ar": "بودرة معالجة أنودة",
+    "wh": "Main Medical Warehouse",
+    "lot": "4102026",
+    "qty": 4,
+    "unit": "Piece"
+  },
+  {
+    "sku": "AMS3.56",
+    "name_ar": "استيكر أمبول 3.5×3.5",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-12102026",
+    "qty": 12,
+    "unit": "Piece"
+  },
+  {
+    "sku": "AMS3.56",
+    "name_ar": "استيكر أمبول 3.5×3.5",
+    "wh": "Main Medical Warehouse",
+    "lot": "2042026",
+    "qty": 86,
+    "unit": "Piece"
+  },
+  {
+    "sku": "AMS3030 (T)",
+    "name_ar": "استيكر حراري للتشغيلة واللوت (3×3)",
+    "wh": "Unlicensed warehouse 815",
+    "lot": "LOT-AMS3030T",
+    "qty": 10,
+    "unit": "Roll"
+  },
+  {
+    "sku": "AMS30304",
+    "name_ar": "استيكر أمبول (3×3) C4000",
+    "wh": "Unlicensed warehouse 815",
+    "lot": "LOT-AMS30304",
+    "qty": 26,
+    "unit": "Roll"
+  },
+  {
+    "sku": "AMS30306",
+    "name_ar": "استيكر أمبول (3×3) C6000",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-12102",
+    "qty": 10,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ANODIZATIO-47",
+    "name_ar": "أسلاك معالجة وأنودة تيتانيوم",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-ANODIZATIO47",
+    "qty": 6.5,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ARABOOILFI-59",
+    "name_ar": "فلتر زيت ماكينات قماش (Arabo)",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-ARABOOILFI59",
+    "qty": 46,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ARABOOILFI-60",
+    "name_ar": "فلتر زيت ماكينات ستانلس (Arabo)",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-ARABOOILFI60",
+    "qty": 20,
+    "unit": "Piece"
+  },
+  {
+    "sku": "Acidic D C",
+    "name_ar": "حمض ستريك (ملح ليمون نقي)",
+    "wh": "Main Medical Warehouse",
+    "lot": "503010130",
+    "qty": 125,
+    "unit": "Kg"
+  },
+  {
+    "sku": "Acidic D V",
+    "name_ar": "منظف حمضي (خل/حمض أسيتيك)",
+    "wh": "Main Medical Warehouse",
+    "lot": "2992026",
+    "qty": 34,
+    "unit": "Piece"
+  },
+  {
+    "sku": "Alkaline D N",
+    "name_ar": "منظف قلوي صناعي (نيترو HD)",
+    "wh": "Main Medical Warehouse",
+    "lot": "1521012026",
+    "qty": 3,
+    "unit": "Piece"
+  },
+  {
+    "sku": "BASICCARTONS-01",
+    "name_ar": "كراتين أساسية لشحن المنتجات",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-BASICCARTONS",
+    "qty": 8,
+    "unit": "Piece"
+  },
+  {
+    "sku": "BASICCARTONS-01",
+    "name_ar": "كراتين أساسية لشحن المنتجات",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-261022-BASICCARTONS-01",
+    "qty": 7,
+    "unit": "Piece"
+  },
+  {
+    "sku": "BLUECOAT-68",
+    "name_ar": "بالطو أزرق معملي",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-BLUECOAT68",
+    "qty": 2,
+    "unit": "Piece"
+  },
+  {
+    "sku": "BR5.6000",
+    "name_ar": "عمود نحاس (بار)",
+    "wh": "Main Medical Warehouse",
+    "lot": "Cu1026",
+    "qty": 69,
+    "unit": "Bar"
+  },
+  {
+    "sku": "CUTTERS-53",
+    "name_ar": "كاتر يدوي للورش",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-CUTTERS53",
+    "qty": 53,
+    "unit": "Piece"
+  },
+  {
+    "sku": "CUTTERSWEA-54",
+    "name_ar": "شفرات كاتر غيار",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-CUTTERSWEA54",
+    "qty": 110,
+    "unit": "Piece"
+  },
+  {
+    "sku": "DARKBLUE-70",
+    "name_ar": "بالطو أزرق داكن",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-DARKBLUE70",
+    "qty": 3,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ELECTRICIT-49",
+    "name_ar": "شريط لاصق عازل كهرباء (شكرتون)",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-ELECTRICIT49",
+    "qty": 16,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ET070%",
+    "name_ar": "كحول إيثيلي 70%",
+    "wh": "Main Medical Warehouse",
+    "lot": "EA700203202",
+    "qty": 65,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ET100%",
+    "name_ar": "كحول إيثيلي نقي 100%",
+    "wh": "Main Medical Warehouse",
+    "lot": "EA19042026",
+    "qty": 55,
+    "unit": "Piece"
+  },
+  {
+    "sku": "EXTRAPARTS-46",
+    "name_ar": "أداة إزالة الزوائد والرايش",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-EXTRAPARTS46",
+    "qty": 14,
+    "unit": "Piece"
+  },
+  {
+    "sku": "FORCEPS-45",
+    "name_ar": "ملاقط دقيقة",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-FORCEPS45",
+    "qty": 8,
+    "unit": "Piece"
+  },
+  {
+    "sku": "GLOVES-41",
+    "name_ar": "قفازات طبية معقمة للغرف النظيفة",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-GLOVES41",
+    "qty": 42,
+    "unit": "Piece"
+  },
+  {
+    "sku": "GOWN-43",
+    "name_ar": "جاون طبي معقم للغرف النظيفة",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-GOWN43",
+    "qty": 28,
+    "unit": "Piece"
+  },
+  {
+    "sku": "HA37%-PAL",
+    "name_ar": "حمض هيدروكلوريك 37% (بالاف)",
+    "wh": "Main Medical Warehouse",
+    "lot": "PC04240228",
+    "qty": 10,
+    "unit": "Bottle"
+  },
+  {
+    "sku": "HA37%-PIO",
+    "name_ar": "حمض هيدروكلوريك 37% (بيوكيم)",
+    "wh": "Main Medical Warehouse",
+    "lot": "HA3701092026",
+    "qty": 18,
+    "unit": "Bottle"
+  },
+  {
+    "sku": "HA37%POWER",
+    "name_ar": "حمض هيدروكلوريك 37% باور",
+    "wh": "Main Medical Warehouse",
+    "lot": "HCL8754L",
+    "qty": 19,
+    "unit": "Bottle"
+  },
+  {
+    "sku": "HDM30",
+    "name_ar": "خامة بولي إيثيلين عالي الكثافة (HDPE (M30",
+    "wh": "Licensed warehouse 244",
+    "lot": "HDM30",
+    "qty": 15,
+    "unit": "Bag"
+  },
+  {
+    "sku": "HOIM98261",
+    "name_ar": "هولدر حامل غرسات (مقبول)",
+    "wh": "Main Medical Warehouse",
+    "lot": "HO030826",
+    "qty": 7,
+    "unit": "Kg"
+  },
+  {
+    "sku": "HOIM98261-INSP",
+    "name_ar": "هولدر حامل غرسات (تحت الفحص)",
+    "wh": "Main Medical Warehouse",
+    "lot": "HO071026",
+    "qty": 7,
+    "unit": "Kg"
+  },
+  {
+    "sku": "HOIM98261-INSP",
+    "name_ar": "هولدر حامل غرسات (تحت الفحص)",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-121021",
+    "qty": 25,
+    "unit": "Kg"
+  },
+  {
+    "sku": "HYGIENEUNI-73",
+    "name_ar": "بدلة نظافة ووقاية معملية",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-HYGIENEUNI73",
+    "qty": 3,
+    "unit": "Piece"
+  },
+  {
+    "sku": "IFU",
+    "name_ar": "نشرة تعليمات الاستخدام (IFU)",
+    "wh": "Main Medical Warehouse",
+    "lot": "3092026",
+    "qty": 3,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ITEM056-56",
+    "name_ar": "أربطة مطاطية (أستك)",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-ITEM05656",
+    "qty": 9,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ITEM062-62",
+    "name_ar": "مكثفات معملية زجاجية",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-ITEM06262",
+    "qty": 8,
+    "unit": "Piece"
+  },
+  {
+    "sku": "MASK-42",
+    "name_ar": "كمامات طبية للغرف النظيفة",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-MASK42",
+    "qty": 46,
+    "unit": "Piece"
+  },
+  {
+    "sku": "NOTEBOOK-65",
+    "name_ar": "دفاتر ملاحظات وسجلات",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-NOTEBOOK65",
+    "qty": 8,
+    "unit": "Piece"
+  },
+  {
+    "sku": "Neutral D N",
+    "name_ar": "منظف متعادل (نيترو MD)",
+    "wh": "Main Medical Warehouse",
+    "lot": "0918072026",
+    "qty": 3,
+    "unit": "Piece"
+  },
+  {
+    "sku": "OVERBEAR-41",
+    "name_ar": "واقي اللحية (أوفر بير)",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-OVERBEAR41",
+    "qty": 7,
+    "unit": "Piece"
+  },
+  {
+    "sku": "OVERHEAD-39",
+    "name_ar": "غطاء رأس للغرف النظيفة (أوفر هيد)",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-261022-OVERHEAD-39",
+    "qty": 9,
+    "unit": "Piece"
+  },
+  {
+    "sku": "OVERSHOES-40",
+    "name_ar": "غطاء حذاء للغرف النظيفة (أوفر شوز)",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-OVERSHOES40",
+    "qty": 42,
+    "unit": "Piece"
+  },
+  {
+    "sku": "PATTERY-51",
+    "name_ar": "بطاريات عامة",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-PATTERY51",
+    "qty": 2,
+    "unit": "Piece"
+  },
+  {
+    "sku": "PB1510",
+    "name_ar": "كيس وقائي خارجي",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-11102026-PB1510",
+    "qty": 80,
+    "unit": "Piece"
+  },
+  {
+    "sku": "PB1510",
+    "name_ar": "كيس وقائي خارجي",
+    "wh": "Unlicensed warehouse 815",
+    "lot": "LOT-11102026-PB1510",
+    "qty": 240,
+    "unit": "Piece"
+  },
+  {
+    "sku": "PBS07106",
+    "name_ar": "استيكر وقائي (7×10) C6000",
+    "wh": "Main Medical Warehouse",
+    "lot": "2672026",
+    "qty": 3,
+    "unit": "Piece"
+  },
+  {
+    "sku": "PBS07106",
+    "name_ar": "استيكر وقائي (7×10) C6000",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-12102026",
+    "qty": 35,
+    "unit": "Piece"
+  },
+  {
+    "sku": "PBS7010 (T)",
+    "name_ar": "استيكر حراري وقائي (10×7)",
+    "wh": "Unlicensed warehouse 815",
+    "lot": "LOT-PBS7010T",
+    "qty": 12,
+    "unit": "Roll"
+  },
+  {
+    "sku": "PBS70104",
+    "name_ar": "استيكر وقائي مستمر (10×7) C4000",
+    "wh": "Unlicensed warehouse 815",
+    "lot": "LOT-PBS70104",
+    "qty": 22,
+    "unit": "Roll"
+  },
+  {
+    "sku": "PINKCOAT-69",
+    "name_ar": "بالطو وردي معملي",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-PINKCOAT69",
+    "qty": 6,
+    "unit": "Piece"
+  },
+  {
+    "sku": "PP901",
+    "name_ar": "خامة بولي بروبيلين حقن (901 راندوم)",
+    "wh": "Licensed warehouse 244",
+    "lot": "PP426",
+    "qty": 15,
+    "unit": "Bag"
+  },
+  {
+    "sku": "PPS084.56",
+    "name_ar": "استيكر وقائي 4.5×8",
+    "wh": "Main Medical Warehouse",
+    "lot": "2042026",
+    "qty": 29,
+    "unit": "Piece"
+  },
+  {
+    "sku": "PS861",
+    "name_ar": "خامة بولي ستيرين حقن (861)",
+    "wh": "Licensed warehouse 244",
+    "lot": "PS426",
+    "qty": 29,
+    "unit": "Bag"
+  },
+  {
+    "sku": "PYREXBOWL-61",
+    "name_ar": "حوض بايركس معملي",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-PYREXBOWL61",
+    "qty": 2,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SA98%",
+    "name_ar": "حمض كبريتيك 98% (بيوكيم)",
+    "wh": "Main Medical Warehouse",
+    "lot": "SA9817082026",
+    "qty": 17,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SAND-74",
+    "name_ar": "حذاء سيفتي / كروكس طبي للغرف النظيفة",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-SAND74",
+    "qty": 1.5,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SBB1007",
+    "name_ar": "أكياس حاجز عقيم",
+    "wh": "Main Medical Warehouse",
+    "lot": "SB120726",
+    "qty": 50,
+    "unit": "Kg"
+  },
+  {
+    "sku": "SBS5060 (T)",
+    "name_ar": "استيكر حراري حاجز عقيم (5×6)",
+    "wh": "Unlicensed warehouse 815",
+    "lot": "LOT-SBS5060T",
+    "qty": 14,
+    "unit": "Roll"
+  },
+  {
+    "sku": "SBS50604",
+    "name_ar": "استيكر حاجز عقيم (5×6) C4000",
+    "wh": "Unlicensed warehouse 815",
+    "lot": "LOT-SBS50604",
+    "qty": 17,
+    "unit": "Roll"
+  },
+  {
+    "sku": "SBS50606",
+    "name_ar": "استيكر حاجز عقيم (5×6) C6000",
+    "wh": "Main Medical Warehouse",
+    "lot": "2672026",
+    "qty": 7,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SCISSORS-44",
+    "name_ar": "مقصات ورش واستخدام عام",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-SCISSORS44",
+    "qty": 5,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ST42008",
+    "name_ar": "خامة ستانلس ستيل 420",
+    "wh": "Main Medical Warehouse",
+    "lot": "ST0426",
+    "qty": 11,
+    "unit": "Bar"
+  },
+  {
+    "sku": "STAPLERPIN-64",
+    "name_ar": "دبابيس دباسة مكتبية",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-STAPLERPIN64",
+    "qty": 30,
+    "unit": "Piece"
+  },
+  {
+    "sku": "STG31606 STG31610",
+    "name_ar": "خامة ستانلس ستيل طبي 316L",
+    "wh": "Main Medical Warehouse",
+    "lot": "ST061025",
+    "qty": 46,
+    "unit": "Bar"
+  },
+  {
+    "sku": "STICKROOLS-48",
+    "name_ar": "شريط لاصق عام (رول)",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-STICKROOLS48",
+    "qty": 47,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SUMMERUNIF-TR-2XL",
+    "name_ar": "بنطلون صيفي للعاملين - مقاس 2XL",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-SUMMERUNIFTR2XL",
+    "qty": 21,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SUMMERUNIF-TR-3XL",
+    "name_ar": "بنطلون صيفي للعاملين - مقاس 3XL",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-SUMMERUNIFTR3XL",
+    "qty": 12,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SUMMERUNIF-TR-4XL",
+    "name_ar": "بنطلون صيفي للعاملين - مقاس 4XL",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-SUMMERUNIFTR4XL",
+    "qty": 11,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SUMMERUNIF-TR-XL",
+    "name_ar": "بنطلون صيفي للعاملين - مقاس XL",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-SUMMERUNIFTRXL",
+    "qty": 11,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SUMMERUNIF-TS-2XL",
+    "name_ar": "تيشيرت صيفي للعاملين - مقاس 2XL",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-SUMMERUNIFTS2XL",
+    "qty": 10,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SUMMERUNIF-TS-L",
+    "name_ar": "تيشيرت صيفي للعاملين - مقاس L",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-SUMMERUNIFTSL",
+    "qty": 11,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SUMMERUNIF-TS-M",
+    "name_ar": "تيشيرت صيفي للعاملين - مقاس M",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-SUMMERUNIFTSM",
+    "qty": 16,
+    "unit": "Piece"
+  },
+  {
+    "sku": "SUMMERUNIF-TS-XL",
+    "name_ar": "تيشيرت صيفي للعاملين - مقاس XL",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-SUMMERUNIFTSXL",
+    "qty": 20,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TE080000",
+    "name_ar": "عمود تفلون قطر 8 مم طول 100 سم",
+    "wh": "Main Medical Warehouse",
+    "lot": "TF0226",
+    "qty": 13,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TEFLONROLL-50",
+    "name_ar": "شريط تفلون عازل (رول)",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-TEFLONROLL50",
+    "qty": 9,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TEPPATTERY-55",
+    "name_ar": "بطاريات أجهزة فحص",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-TEPPATTERY55",
+    "qty": 6,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TI120000",
+    "name_ar": "بلوك تيتانيوم مقاس 12",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-TI120000",
+    "qty": 132,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TI140000",
+    "name_ar": "بلوك تيتانيوم مقاس 14",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-TI140000",
+    "qty": 16,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TIG50400",
+    "name_ar": "خامة تيتانيوم (قطر 4 مم طول 2.80 م)",
+    "wh": "Licensed warehouse 244",
+    "lot": "GR5-26#-24",
+    "qty": 60,
+    "unit": "Bar"
+  },
+  {
+    "sku": "TIG50600",
+    "name_ar": "خامة تيتانيوم جريد 5 (قطر 6 مم طول 2.80 م)",
+    "wh": "Main Medical Warehouse",
+    "lot": "LH2023278",
+    "qty": 1945,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TIG50800",
+    "name_ar": "خامة تيتانيوم (قطر 8 مم طول 2.80 م - وزن البار 630 جم)",
+    "wh": "Licensed warehouse 244",
+    "lot": "GR5-26#-24",
+    "qty": 18,
+    "unit": "Bar"
+  },
+  {
+    "sku": "TROUSERS-2XL",
+    "name_ar": "بنطلون عمل - مقاس 2XL",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-TROUSERS2XL",
+    "qty": 4,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TROUSERS-40",
+    "name_ar": "بنطلون عمل - مقاس 40",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-TROUSERS40",
+    "qty": 2,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TROUSERS-48",
+    "name_ar": "بنطلون عمل - مقاس 48",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-TROUSERS48",
+    "qty": 2,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TROUSERS-52",
+    "name_ar": "بنطلون عمل - مقاس 52",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-TROUSERS52",
+    "qty": 3,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TROUSERS-L",
+    "name_ar": "بنطلون عمل - مقاس L",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-TROUSERSL",
+    "qty": 1,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TROUSERS-XL",
+    "name_ar": "بنطلون عمل - مقاس XL",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-TROUSERSXL",
+    "qty": 14,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TRS40154",
+    "name_ar": "استيكر تتبع (4×1.5) C4000",
+    "wh": "Unlicensed warehouse 815",
+    "lot": "LOT-TRS40154",
+    "qty": 46,
+    "unit": "Roll"
+  },
+  {
+    "sku": "TRS40156",
+    "name_ar": "استيكر تتبع (4×1.5) C6000",
+    "wh": "Main Medical Warehouse",
+    "lot": "1082026",
+    "qty": 8,
+    "unit": "Piece"
+  },
+  {
+    "sku": "TRS40156",
+    "name_ar": "استيكر تتبع (4×1.5) C6000",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-12102026",
+    "qty": 15,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ULTRASONIC-58",
+    "name_ar": "جهاز غسيل بالموجات فوق الصوتية",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-ULTRASONIC58",
+    "qty": 1,
+    "unit": "Piece"
+  },
+  {
+    "sku": "ULTRASONIC-58",
+    "name_ar": "جهاز غسيل بالموجات فوق الصوتية",
+    "wh": "Unlicensed warehouse 815",
+    "lot": "LOT-ULTRASONIC58",
+    "qty": 1,
+    "unit": "Piece"
+  },
+  {
+    "sku": "VERNEIRPAT-52",
+    "name_ar": "بطاريات قدمة ذات ورنية رقمية",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-VERNEIRPAT52",
+    "qty": 9,
+    "unit": "Piece"
+  },
+  {
+    "sku": "VIAL11841",
+    "name_ar": "أمبولات زجاجية/بلاستيكية",
+    "wh": "Main Medical Warehouse",
+    "lot": "AM0826",
+    "qty": 10.5,
+    "unit": "Kg"
+  },
+  {
+    "sku": "VIAL11841",
+    "name_ar": "أمبولات زجاجية/بلاستيكية",
+    "wh": "Main Medical Warehouse",
+    "lot": "AM0426",
+    "qty": 9.5,
+    "unit": "Kg"
+  },
+  {
+    "sku": "WHITECOAT-67",
+    "name_ar": "بالطو أبيض معملي",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-WHITECOAT67",
+    "qty": 7,
+    "unit": "Piece"
+  },
+  {
+    "sku": "WINTERUNIF-66",
+    "name_ar": "يونيفورم شتوي للعاملين",
+    "wh": "Main Medical Warehouse",
+    "lot": "LOT-WINTERUNIF66",
+    "qty": 1,
+    "unit": "Piece"
+  },
+  {
+    "sku": "WOS5050(T)",
+    "name_ar": "استيكر حراري لأمر الشغل (5×5)",
+    "wh": "Unlicensed warehouse 815",
+    "lot": "LOT-WOS5050T",
+    "qty": 41,
+    "unit": "Roll"
+  }
+]

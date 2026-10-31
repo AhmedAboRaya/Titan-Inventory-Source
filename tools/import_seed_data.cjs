@@ -1002,6 +1002,16 @@ async function main() {
     console.error('Error configuring stock levels:', levelErr);
   }
 
+  // ==========================================
+  // 12. SYNCHRONIZE BALANCES TO OCT 31 STATE
+  // ==========================================
+  try {
+    const { syncOct31Balances } = require('./sync_oct31_balances.cjs');
+    await syncOct31Balances(base, authHeaders);
+  } catch (sync31Err) {
+    console.error('Error during Oct 31 balance sync:', sync31Err);
+  }
+
   console.log('\n======================================================');
   console.log('✓ SEED & MIGRATION COMPLETE');
   console.log(`✓ Main Medical Warehouse: ${mainWarehouse.name} (${mainWarehouse.id})`);
