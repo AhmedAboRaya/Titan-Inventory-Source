@@ -33,6 +33,7 @@ export function ItemPicker({
   // Hierarchical selection state
   const [selectedMainCat, setSelectedMainCat] = useState<string>('');
   const [selectedSubCat, setSelectedSubCat] = useState<string>('');
+  const [selectedLeafCat, setSelectedLeafCat] = useState<string>('');
 
   // Direct search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,22 +49,26 @@ export function ItemPicker({
     return allCategories.filter(c => !c.parent_id);
   }, [allCategories]);
 
-  // Subcategories for selected main category
+  // Subcategories for selected main category (Level 2)
   const subCategories = useMemo(() => {
     if (!selectedMainCat) return [];
     return allCategories.filter(c => c.parent_id === selectedMainCat);
   }, [allCategories, selectedMainCat]);
 
+  // Leaf categories (Level 3) for selected subcategory
+  const leafCategories = useMemo(() => {
+    if (!selectedSubCat) return [];
+    return allCategories.filter(c => c.parent_id === selectedSubCat);
+  }, [allCategories, selectedSubCat]);
+
   // Query items for category mode
   const categoryItemsQuery = useMemo(() => {
-    if (selectedSubCat) {
-      return `items?limit=100&category_id=${encodeURIComponent(selectedSubCat)}${warehouseId ? '&warehouse_id=' + encodeURIComponent(warehouseId) : ''}`;
-    }
-    if (selectedMainCat) {
-      return `items?limit=100&category_id=${encodeURIComponent(selectedMainCat)}${warehouseId ? '&warehouse_id=' + encodeURIComponent(warehouseId) : ''}`;
+    const targetCat = selectedLeafCat || selectedSubCat || selectedMainCat;
+    if (targetCat) {
+      return `items?limit=100&category_id=${encodeURIComponent(targetCat)}${warehouseId ? '&warehouse_id=' + encodeURIComponent(warehouseId) : ''}`;
     }
     return null;
-  }, [selectedMainCat, selectedSubCat, warehouseId]);
+  }, [selectedMainCat, selectedSubCat, selectedLeafCat, warehouseId]);
 
   const catItemsRes = useData<Row[]>(categoryItemsQuery);
 
@@ -94,11 +99,22 @@ export function ItemPicker({
       const itemCat = allCategories.find(c => c.id === currentItem.category_id);
       if (itemCat) {
         if (itemCat.parent_id) {
-          setSelectedMainCat(itemCat.parent_id);
-          setSelectedSubCat(itemCat.id);
+          const parentCat = allCategories.find(c => c.id === itemCat.parent_id);
+          if (parentCat && parentCat.parent_id) {
+            // itemCat is Level 3
+            setSelectedMainCat(parentCat.parent_id);
+            setSelectedSubCat(parentCat.id);
+            setSelectedLeafCat(itemCat.id);
+          } else {
+            // itemCat is Level 2
+            setSelectedMainCat(itemCat.parent_id);
+            setSelectedSubCat(itemCat.id);
+            setSelectedLeafCat('');
+          }
         } else {
           setSelectedMainCat(itemCat.id);
           setSelectedSubCat('');
+          setSelectedLeafCat('');
         }
       }
     }
@@ -136,6 +152,7 @@ export function ItemPicker({
   function handleClear() {
     onChange('', undefined);
     setSelectedSubCat('');
+    setSelectedLeafCat('');
   }
 
   return (
@@ -185,6 +202,7 @@ export function ItemPicker({
                 onChange={e => {
                   setSelectedMainCat(e.target.value);
                   setSelectedSubCat('');
+                  setSelectedLeafCat('');
                 }}
               >
                 <option value="">{t('— اختر التصنيف الرئيسي —', '— Choose main category —')}</option>
@@ -204,7 +222,10 @@ export function ItemPicker({
               <select
                 value={selectedSubCat}
                 disabled={!selectedMainCat || subCategories.length === 0}
-                onChange={e => setSelectedSubCat(e.target.value)}
+                onChange={e => {
+                  setSelectedSubCat(e.target.value);
+                  setSelectedLeafCat('');
+                }}
               >
                 <option value="">
                   {!selectedMainCat
@@ -221,6 +242,26 @@ export function ItemPicker({
               </select>
             </label>
           </div>
+
+          {/* Level 3: Leaf Category / Family (only if subcategory has children) */}
+          {leafCategories.length > 0 && (
+            <div className="cascade-field">
+              <label>
+                <small>{t('النوع / العائلة', 'Sub-type / Family')}</small>
+                <select
+                  value={selectedLeafCat}
+                  onChange={e => setSelectedLeafCat(e.target.value)}
+                >
+                  <option value="">{t('— اختر النوع أو العائلة —', '— Choose family / type —')}</option>
+                  {leafCategories.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {app.lang === 'ar' ? (c.name_ar || c.name_en) : (c.name_en || c.name_ar)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )}
 
           {/* Item Selector */}
           <div className="cascade-field">
@@ -248,13 +289,13 @@ export function ItemPicker({
                 </option>
                 {catItemsRes.data?.map(i => (
                   <option key={i.id} value={i.id}>
-                    {i.sku} · {app.lang === 'ar' ? (i.name_ar || i.name_en) : (i.name_en || i.name_ar)}
+                    {i.sku} · {app.lang === 'ar' ? (i.name_ar || i.name_en) : (i.name_en || i.name_ar)}{i.specification ? ` (${i.specification})` : ''}
                   </option>
                 ))}
                 {/* Keep current selected item in options if not in current category results */}
                 {currentItem && !catItemsRes.data?.some(i => i.id === currentItem.id) && (
                   <option value={currentItem.id}>
-                    {currentItem.sku} · {app.lang === 'ar' ? (currentItem.name_ar || currentItem.name_en) : (currentItem.name_en || currentItem.name_ar)}
+                    {currentItem.sku} · {app.lang === 'ar' ? (currentItem.name_ar || currentItem.name_en) : (currentItem.name_en || currentItem.name_ar)}{currentItem.specification ? ` (${currentItem.specification})` : ''}
                   </option>
                 )}
               </select>

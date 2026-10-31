@@ -92,6 +92,21 @@ async function main() {
     return res.body || [];
   }
 
+  async function fetchAllPaginated(p) {
+    let all = [];
+    let offset = 0;
+    while (true) {
+      const sep = p.includes('?') ? '&' : '?';
+      const res = await request(`${BASE}/${p}${sep}limit=100&offset=${offset}`, { headers: authHeaders });
+      const batch = res.body || [];
+      if (!Array.isArray(batch) || batch.length === 0) break;
+      all.push(...batch);
+      if (batch.length < 100) break;
+      offset += 100;
+    }
+    return all;
+  }
+
   console.log('\n[2/4] Fetching all tables and entities...');
   const warehouses = await fetchAll('warehouses?all=true');
   console.log(`- Warehouses: ${warehouses.length}`);
@@ -105,7 +120,7 @@ async function main() {
   const masters = await fetchAll('masters?all=true');
   console.log(`- Masters (Departments, Employees, Suppliers, Machines): ${masters.length}`);
 
-  const items = await fetchAll('items?limit=1000');
+  const items = await fetchAllPaginated('items');
   console.log(`- Items (Products): ${items.length}`);
 
   // Fetch lots for all lot-tracked items

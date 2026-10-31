@@ -14,12 +14,21 @@ export class Catalog {
   if(kind==='locations')return (await tx.query('SELECT * FROM locations WHERE active AND ($1::uuid[] IS NULL OR warehouse_id=ANY($1)) ORDER BY name',[scope])).rows;
   if(kind==='categories'){
    const rows=(await tx.query(`SELECT c.*, (SELECT count(*)::int FROM categories sub WHERE sub.parent_id=c.id AND sub.active) subcategory_count,
-    (SELECT count(*)::int FROM items i WHERE i.active AND (i.category_id=c.id OR i.category_id IN(SELECT id FROM categories WHERE parent_id=c.id)) AND ($1::uuid[] IS NULL OR EXISTS(SELECT 1 FROM balances b WHERE b.item_id=i.id AND b.warehouse_id=ANY($1)))) item_count
+    (SELECT count(*)::int FROM items i WHERE i.active AND (i.category_id=c.id OR i.category_id IN(SELECT id FROM categories WHERE parent_id=c.id OR parent_id IN (SELECT id FROM categories WHERE parent_id=c.id))) AND ($1::uuid[] IS NULL OR EXISTS(SELECT 1 FROM balances b WHERE b.item_id=i.id AND b.warehouse_id=ANY($1)))) item_count
     FROM categories c WHERE c.active ORDER BY c.sort,c.name_en`,[scope])).rows;
    const metrics=(await tx.query(`WITH stock AS (SELECT b.item_id,b.warehouse_id,sum(CASE WHEN b.quality='Accepted' AND b.condition NOT IN('Repair','Damaged') AND b.holder_id IS NULL AND b.transit_id IS NULL AND (lot.expires_on IS NULL OR lot.expires_on>=CURRENT_DATE) THEN b.quantity-b.reserved ELSE 0 END) available FROM balances b LEFT JOIN lots lot ON lot.id=b.lot_id WHERE ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1)) GROUP BY b.item_id,b.warehouse_id)
     SELECT i.category_id,count(DISTINCT i.id)::int low_stock_count FROM item_levels levels JOIN items i ON i.id=levels.item_id LEFT JOIN stock s ON s.item_id=levels.item_id AND s.warehouse_id=levels.warehouse_id WHERE i.active AND ($1::uuid[] IS NULL OR levels.warehouse_id=ANY($1)) AND COALESCE(s.available,0)<levels.minimum GROUP BY i.category_id`,[scope])).rows;
    const values=a.permissions.includes('cost.read')?(await tx.query(`SELECT i.category_id,sum(CASE WHEN c.unpriced_quantity=0 AND c.quantity>0 THEN b.quantity*c.value/c.quantity ELSE 0 END) value,count(DISTINCT CASE WHEN b.quantity>0 AND c.unpriced_quantity>0 THEN i.id END)::int unpriced_items FROM balances b JOIN items i ON i.id=b.item_id LEFT JOIN costs c ON c.item_id=b.item_id WHERE ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1)) GROUP BY i.category_id`,[scope])).rows:[];
-   for(const row of rows){const ids=new Set([row.id,...rows.filter(c=>c.parent_id===row.id).map(c=>c.id)]);row.low_stock_count=metrics.filter(m=>ids.has(m.category_id)).reduce((n,m)=>n+m.low_stock_count,0);if(a.permissions.includes('cost.read')){row.value=values.filter(v=>ids.has(v.category_id)).reduce((sum,v)=>sum.add(v.value||0),new Decimal(0)).toFixed(2);row.unpriced_items=values.filter(v=>ids.has(v.category_id)).reduce((n,v)=>n+v.unpriced_items,0);}}
+   for(const row of rows){
+     const childIds = rows.filter(c=>c.parent_id===row.id).map(c=>c.id);
+     const grandchildIds = rows.filter(c=>childIds.includes(c.parent_id)).map(c=>c.id);
+     const ids=new Set([row.id,...childIds,...grandchildIds]);
+     row.low_stock_count=metrics.filter(m=>ids.has(m.category_id)).reduce((n,m)=>n+m.low_stock_count,0);
+     if(a.permissions.includes('cost.read')){
+       row.value=values.filter(v=>ids.has(v.category_id)).reduce((sum,v)=>sum.add(v.value||0),new Decimal(0)).toFixed(2);
+       row.unpriced_items=values.filter(v=>ids.has(v.category_id)).reduce((n,v)=>n+v.unpriced_items,0);
+     }
+   }
    return rows;
   }
   if(kind==='items'){
@@ -30,7 +39,7 @@ export class Catalog {
     COALESCE((SELECT sum(b.reserved) FROM balances b WHERE b.item_id=i.id AND ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1))),0) reserved,
     COALESCE((SELECT max(levels.minimum) FROM item_levels levels WHERE levels.item_id=i.id AND ($1::uuid[] IS NULL OR levels.warehouse_id=ANY($1))),0) minimum,
     (SELECT id FROM attachments at WHERE at.item_id=i.id AND at.primary_image AND at.document_id IS NULL AND at.warehouse_id IS NULL LIMIT 1) image_id
-    FROM items i JOIN categories c ON c.id=i.category_id LEFT JOIN costs ON costs.item_id=i.id WHERE i.active AND ($2::uuid IS NULL OR i.category_id=$2 OR c.parent_id=$2)
+    FROM items i JOIN categories c ON c.id=i.category_id LEFT JOIN costs ON costs.item_id=i.id WHERE i.active AND ($2::uuid IS NULL OR i.category_id=$2 OR c.parent_id=$2 OR c.parent_id IN (SELECT id FROM categories WHERE parent_id=$2))
     AND ($3='' OR concat_ws(' ',i.sku,i.name_ar,i.name_en,i.brand,i.specification) ILIKE '%'||$3||'%' OR EXISTS(SELECT 1 FROM item_codes ic WHERE ic.item_id=i.id AND ic.code ILIKE '%'||$3||'%'))
     AND (NOT $6::boolean OR $1::uuid[] IS NULL OR EXISTS(SELECT 1 FROM balances b WHERE b.item_id=i.id AND b.warehouse_id=ANY($1)))
     ORDER BY i.sku LIMIT $4 OFFSET $5`,[scope,q.category_id?uuid.parse(q.category_id):null,(q.search||'').slice(0,120),limit,offset,inWarehouseOnly])).rows,a);
@@ -76,12 +85,25 @@ export class Catalog {
    else id=(await tx.query('INSERT INTO masters(kind,name,data) VALUES($1,$2,$3) RETURNING id',[b.kind,b.name,json(b.data)])).rows[0].id;
   } else if(kind==='categories'){
    const b=z.object({name_ar:text,name_en:text,parent_id:nullableId,illustration:z.string().regex(/^[a-z0-9-]{1,60}$/),sort:z.number().int().min(0).max(10000).default(0),version:z.number().int().optional(),active:z.boolean().default(true)}).strict().parse(body);
-   if(b.parent_id){const parent=await one(tx,'SELECT * FROM categories WHERE id=$1',[b.parent_id]);if(!parent||parent.parent_id||b.parent_id===id)fail('CATEGORY','مسموح بمستويين فقط');}
+   if(b.parent_id){
+      if(b.parent_id===id)fail('CATEGORY','لا يمكن جعل التصنيف أباً لنفسه');
+      const parent=await one(tx,'SELECT * FROM categories WHERE id=$1',[b.parent_id]);
+      if(!parent)fail('CATEGORY','التصنيف الأب غير موجود');
+      if(parent.parent_id===id)fail('CATEGORY','حلقة تكرارية غير مسموح بها');
+      if(parent.parent_id){
+        const grandparent=await one(tx,'SELECT * FROM categories WHERE id=$1',[parent.parent_id]);
+        if(grandparent&&(grandparent.parent_id||grandparent.id===id))fail('CATEGORY','مسموح بثلاثة مستويات كحد أقصى');
+      }
+      if(id){
+        const children=(await tx.query('SELECT id FROM categories WHERE parent_id=$1',[id])).rows;
+        if(children.length>0&&parent.parent_id)fail('CATEGORY','هذا التصنيف له تصنيفات فرعية ولا يمكن تحويله للمستوى الثالث');
+      }
+    }
    if(id){const old=await one(tx,'SELECT * FROM categories WHERE id=$1',[id]);if(!old||old.version!==b.version)fail('CONFLICT','التصنيف تغير',409);if(old.parent_id!==b.parent_id&&await one(tx,'SELECT 1 FROM categories WHERE parent_id=$1',[id]))fail('CATEGORY','انقل التصنيفات الفرعية أولًا');await tx.query('UPDATE categories SET name_ar=$2,name_en=$3,parent_id=$4,illustration=$5,sort=$6,active=$7,version=version+1 WHERE id=$1',[id,b.name_ar,b.name_en,b.parent_id||null,b.illustration,b.sort,b.active]);}
    else id=(await tx.query('INSERT INTO categories(name_ar,name_en,parent_id,illustration,sort) VALUES($1,$2,$3,$4,$5) RETURNING id',[b.name_ar,b.name_en,b.parent_id||null,b.illustration,b.sort])).rows[0].id;
   } else if(kind==='items'){
    const b=z.object({sku:text,name_ar:text,name_en:z.string().max(180).default(''),category_id:uuid,description:z.string().max(4000).default(''),brand:z.string().max(180).default(''),specification:z.string().max(2000).default(''),base_unit:z.enum(units),precision:z.number().int().min(0).max(6),tracking:z.enum(['consumable','custody','asset']),track_lot:z.boolean().default(false),track_serial:z.boolean().default(false),track_expiry:z.boolean().default(false),data:z.record(z.string().max(100),z.string().max(4000)).default({}),active:z.boolean().default(true),version:z.number().int().optional()}).strict().parse(body);
-   if(!await one(tx,'SELECT 1 FROM categories WHERE id=$1 AND active AND parent_id IS NOT NULL',[b.category_id]))fail('CATEGORY','اختر تصنيفًا فرعيًا فعالًا');
+   if(!await one(tx,`SELECT 1 FROM categories c WHERE c.id=$1 AND c.active AND c.parent_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM categories sub WHERE sub.parent_id=c.id AND sub.active)`,[b.category_id]))fail('CATEGORY','اختر تصنيفًا نهائيًا فعالًا لا يتبع له تصنيفات فرعية');
    if(b.track_serial&&(b.base_unit!=='Piece'||b.precision!==0))fail('SERIAL','السيريال يتطلب وحدة Piece صحيحة');if(b.track_expiry&&!b.track_lot)fail('LOT','تاريخ الصلاحية يحتاج تتبع اللوت');
    const values=[b.sku,b.name_ar,b.name_en,b.category_id,b.description,b.brand,b.specification,b.base_unit,b.precision,b.tracking,b.track_lot,b.track_serial,b.track_expiry,json(b.data),b.active];
    if(id){const old=await one(tx,'SELECT * FROM items WHERE id=$1',[id]);if(!old||old.version!==b.version)fail('CONFLICT','الصنف تغير؛ راجع النسخة الحالية',409);if((old.base_unit!==b.base_unit||old.precision!==b.precision||old.track_lot!==b.track_lot||old.track_serial!==b.track_serial||old.track_expiry!==b.track_expiry||old.tracking!==b.tracking)&&await one(tx,'SELECT 1 FROM document_lines WHERE item_id=$1',[id]))fail('UNIT_HISTORY','لا يمكن تغيير الوحدة أو التتبع بعد استخدامها');await tx.query('UPDATE items SET sku=$1,name_ar=$2,name_en=$3,category_id=$4,description=$5,brand=$6,specification=$7,base_unit=$8,precision=$9,tracking=$10,track_lot=$11,track_serial=$12,track_expiry=$13,data=$14,active=$15,version=version+1 WHERE id=$16',[...values,id]);}

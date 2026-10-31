@@ -105,7 +105,7 @@ export class Inventory {
     COALESCE(sum(b.quantity), 0) total_qty
     ${a.permissions.includes('cost.read')?', COALESCE(sum(CASE WHEN costs.unpriced_quantity=0 AND costs.quantity>0 THEN b.quantity*costs.value/costs.quantity ELSE 0 END), 0) category_value':''}
     FROM categories c
-    JOIN items i ON (i.category_id=c.id OR i.category_id IN (SELECT id FROM categories sub WHERE sub.parent_id=c.id)) AND i.active
+    JOIN items i ON (i.category_id=c.id OR i.category_id IN (SELECT id FROM categories sub WHERE sub.parent_id=c.id OR sub.parent_id IN (SELECT id FROM categories WHERE parent_id=c.id))) AND i.active
     LEFT JOIN balances b ON b.item_id=i.id AND ($1::uuid[] IS NULL OR b.warehouse_id=ANY($1))
     ${a.permissions.includes('cost.read')?'LEFT JOIN costs ON costs.item_id=i.id':''}
     WHERE c.parent_id IS NULL AND c.active

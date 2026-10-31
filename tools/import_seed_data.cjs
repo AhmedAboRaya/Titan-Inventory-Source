@@ -1012,6 +1012,16 @@ async function main() {
     console.error('Error during Oct 31 balance sync:', sync31Err);
   }
 
+  // ==========================================
+  // 13. SEED CNC 3-LEVEL CATEGORIES & INVENTORY
+  // ==========================================
+  try {
+    const { seedCncInventory } = require('./seed_cnc_inventory.cjs');
+    await seedCncInventory(base, authHeaders);
+  } catch (cncErr) {
+    console.error('Error during CNC seed:', cncErr);
+  }
+
   console.log('\n======================================================');
   console.log('✓ SEED & MIGRATION COMPLETE');
   console.log(`✓ Main Medical Warehouse: ${mainWarehouse.name} (${mainWarehouse.id})`);

@@ -104,7 +104,7 @@ export class Workflows{
   permit(a,'import');
   if(!id){
    const b=z.object({source:text,rows:z.array(z.object({source_row:z.number().int().positive(),original_text:z.string().max(4000),sku:text,name_ar:text,name_en:z.string().max(180).default(''),category_id:uuid,base_unit:z.enum(units),precision:z.number().int().min(0).max(6),brand:z.string().max(180).default(''),specification:z.string().max(2000).default('')}).strict()).min(1).max(1000)}).strict().parse(body);
-   const seen=new Set<string>();const rows=[];for(const r of b.rows){const issues:string[]=[];if(seen.has(r.sku)||await one(tx,'SELECT 1 FROM items WHERE sku=$1',[r.sku]))issues.push('SKU مكرر؛ يحتاج مراجعة ولا يُضاف تلقائيًا');seen.add(r.sku);if(!await one(tx,'SELECT 1 FROM categories WHERE id=$1 AND parent_id IS NOT NULL AND active',[r.category_id]))issues.push('التصنيف الفرعي غير صالح');rows.push({...r,issues});}
+   const seen=new Set<string>();const rows=[];for(const r of b.rows){const issues:string[]=[];if(seen.has(r.sku)||await one(tx,'SELECT 1 FROM items WHERE sku=$1',[r.sku]))issues.push('SKU مكرر؛ يحتاج مراجعة ولا يُضاف تلقائيًا');seen.add(r.sku);if(!await one(tx,'SELECT 1 FROM categories c WHERE c.id=$1 AND c.parent_id IS NOT NULL AND c.active AND NOT EXISTS (SELECT 1 FROM categories sub WHERE sub.parent_id=c.id AND sub.active)',[r.category_id]))issues.push('التصنيف غير صالح؛ يجب اختيار تصنيف نهائي لا تتبع له فروع');rows.push({...r,issues});}
    id=(await tx.query('INSERT INTO imports(created_by,source,rows) VALUES($1,$2,$3) RETURNING id',[a.id,b.source,json(rows)])).rows[0].id;
   }else if(action==='approve'){
    permit(a,'approve');permit(a,'catalog.write');const b=z.object({selected_rows:z.array(z.number().int().positive()).min(1).max(1000)}).strict().parse(body);
